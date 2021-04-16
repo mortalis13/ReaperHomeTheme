@@ -467,6 +467,8 @@ set tcp.pan.label.margin   [0]
 
 
 ; >>>> Fonts / Colors
+set tcp.trackidx.font  [3]
+
 set tcp.label.color [255 255 255]
 
 set tcp.volume.color [0 0 0 255 220 20 20 255]
