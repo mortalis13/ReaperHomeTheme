@@ -408,40 +408,25 @@ doHideLogic   input_group   42
 doHideLogic   values        43
 doHideLogic   meter_values  44
 
-;    element          size           padding?
-;then tcp.recarm      20             0
-;then tcp.recmon      15             0
-;then tcp.label       tcp_LabelSize  0
-;then tcp.volume      tcp_VolSize    0
-;then tcp.io          34             1
-;then fx_group        36             1
-;then tcp.env         41             1
-;then pan_group       tcp_PanSize    1
-;then tcp.recmode     39             1
-;then input_group     tcp_InSize     1
-
 
 ;-------------
 set tcp.label  .
 drawTcp
 ;-------------
 
-; element_h = 20
-; tcp.size [300 100]
-
 
 ; [VARS]
-set track_idx_off   [main_sec]
-set btn_h     20
+set track_idx_off  [main_sec]
+set btn_h          20
 set tcp_pad_left   6
-set tcp_pad_right   10
+set tcp_pad_right  10
 
 set row1_y   6
-set row2_y   44
-set row3_y   86
-set row4_y   116
-set row5_y   150
-set row6_y   170
+set row2_y   40
+set row3_y   76
+set row4_y   102
+set row5_y   134
+set row6_y   160
 
 set tcp_w         tcp_size{0}
 set io_w          34
@@ -483,15 +468,17 @@ set tcp.pan.label.margin   [0]
 
 ; >>>> Fonts / Colors
 set tcp.label.color [255 255 255]
-set tcp.volume.label.font [2]
-set tcp.volume.label.color [255 255 255]
-set tcp.pan.label.color [255 255 255]
-set tcp.pan.label.font [2]
 
 set tcp.volume.color [0 0 0 255 220 20 20 255]
+set tcp.volume.label.font [2]
+set tcp.volume.label.color [0 0 0]
+
 set tcp.pan.color [0 0 0 255 220 20 20 255]
+set tcp.pan.label.color [0 0 0]
+set tcp.pan.label.font [2]
 
 set tcp.meter.readout.color [255 255 255]
+; scale labels filled/unfilled colors
 set tcp.meter.scale.color.lit.bottom [0 0 0 255]
 set tcp.meter.scale.color.lit.top [0 0 0 255]
 set tcp.meter.scale.color.unlit.bottom [255 255 255 255]
@@ -536,17 +523,7 @@ set tcp.pan      + - - - [tcp_w] [tcp.meter{w}] [tcp_pad_right] [pan_w2] [0 row4
 
 
 
-; [TEST]
-
-;set tcp.io   + - - - [w] [tcp.meter{w}] [6] [34] [0 6 34 20]
-;set tcp.io   [0 20 34 20]
-
-
-
-
-
 ; *******************************************************************************************************************
-
 
 #<
 #>------------------------- MASTER TRACK CONTROL PANEL --------------------------------
