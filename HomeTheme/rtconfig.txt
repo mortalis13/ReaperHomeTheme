@@ -232,7 +232,6 @@ macro calcTcpSecs scale
     set meter_sec                               ?supercollapsed{0} [0] ?mainCollapse{0} ?meterRight{0} \
                                                     - + [main_sec 0 w h] [main_sec{2} 0] + [0 0 main_sec{0}] [0 0 main_sec] \
                                                     - - [folder_sec{2} 0 w h] [0 0 folder_sec] * scale [0 0 20]
-    
     set tcpMinSize                              + + * scale h<soloFlip_h{0} 60 44 folder_sec{2} element_h{0}
     set tcp.size                                + * scale [300 100] [0 0 tcpMinSize{0}]
     set tcp_LabelSize                           ?labelFlip{0} [0]   ; not included in mainsec calculations if flipped
@@ -374,36 +373,34 @@ macro drawTcp scale
 endMacro
 
 
+;-------------
+
 front                             tcp.recarm tcp.label tcp.volume tcp.solo tcp.mute tcp.phase tcp.width tcp.foldercomp tcp.folder
-paramPair   tcp_indent            2 0 3 5 10 20 40 60
-paramPair   tcp_control_align     79 0 1 2
-parampair   tcp_sepSends          81 0 1
-set tcpLabelAutoMeasured          param19
+set tcp_indent            20
+set tcp_control_align     0
+set tcpLabelAutoMeasured  100
 
-paramPair   tcp_MeterSize   32 4 10 22 40 80 160 320
-paramPair   tcp_MeterLoc    45 0 1 2
-paramPair   tcp_VolSize     31 20 40 70 100 130 160 190
-paramPair   tcp_InSize      46 49 64 80 100 130 190 240
-paramPair   tcp_LabelPair   47 0 20 50 80 110 140 170
-parampair   tcp_sepSends    82 0 1
-
-set tcp_MeterSize 10
+set tcp_MeterLoc    1
+set tcp_LabelPair   110
+set tcp_sepSends    0
+set tcp_MeterSize   10
 
 set scale 1
+
+;-------------
 calcTcpSecs
 resetHides
 
-set tcp_size [360 160]
-set tcp.size [tcp_size tcp_size]
+set tcp_size   [360 160]
+set tcp.size   [tcp_size tcp_size]
+set tcp_w      tcp_size{0}
 
-set meter_sec   + - meter_sec [0 0 10 0] [10]
-set meter_sec   ?mainCollapse{0}  - [main_sec 0 w h] [0 0 main_sec{0}]
-
+set meter_sec  + - meter_sec [0 0 10 0] [10]
+set meter_sec  ?mainCollapse{0}  - [main_sec 0 w h] [0 0 main_sec{0}]
 
 ;-------------
 set tcp.label  .
 drawTcp
-;-------------
 
 
 ; [VARS]
@@ -411,175 +408,154 @@ set track_idx_off  [main_sec]
 set tcp_pad_left   h<44  4 6
 set tcp_pad_right  h<44  8 10
 
-set row1_y   6
-set row2_y   40
-set row3_y   76
-set row4_y   102
-set row5_y   134
-set row6_y   160
+set row1_y    6
+set row2_y    40
+set row3_y    76
+set row4_y    102
+set row5_y    134
+set row6_y    160
 
-set row4_y   h<138 row3_y
+set row4_y    h<138 row3_y
 
-set btn_h    20
-set label_h  30
+set btn_h        20
+set btn_h2       30
+set label_h      30
 
-set tcp_w         tcp_size{0}
-set io_w          34
-set mute_solo_w   21
-set fx_w          20
-set fx_byp_w      16
-set phase_w       16
-set env_w         41
-set recin_w       150
-set recmode_w     39
-set recmon_w      19
-set pan_w         20
-set labels_w      80
+set readout_w    80
+set mute_solo_w  32
+set fx_w         30
+set env_w        61
+set io_w         51
+set pan_w        30
+set recmon_w     30
 
 
-set btn_h2        30
-set mute_solo_w2  32
-set fx_w2         30
-set env_w2        61
-set io_w2         51
-set pan_w2        30
-set recmon_w2     30
-
-
-; [PRO]
-;  <<< Override >>>
+; >>>> Override >>>>
 set tcp.meter        meter_sec
 set tcp.folder     + tcp.folder [0 60]
 set tcp.trackidx   + tcp.trackidx [0 0 0 60]
 
-set tcp.label.margin   * scale + OSoffs + [4 1 2 2 0] h<44 [4] [0]
+set tcp.label.margin   * scale + OSoffs + [4 1 2 2 0]  h<44 [4] [0]
 
 set tcp.volume.fadermode     [0]
-set tcp.volume.label       + [track_idx_off] [6 row5_y labels_w 20]
-set tcp.pan.label          + - - [tcp_w] [tcp.meter{w}] - [labels_w] [20] [0 row5_y labels_w 20 1 0 1 0]
+set tcp.volume.label       + [track_idx_off]  [6 row5_y readout_w 20]
+set tcp.pan.label          + - - [tcp_w] [tcp.meter{w}]  - [readout_w] [20]  [0 row5_y readout_w 20 1 0 1 0]
 set tcp.pan.label.margin     [0]
-
-;set w_left  - / w 2 labels_w
-;set tcp.width.label        [w_left row5_y labels_w 20]
 
 
 ; >>>> Fonts / Colors
 set tcp.trackidx.font  [3]
-set tcp.label.color [255 255 255]
+set tcp.label.color    [255 255 255]
 
-set tcp.volume.color [0 0 0 255 220 20 20 255]
-set tcp.volume.label.font [2]
-set tcp.volume.label.color [0 0 0]
+set tcp.volume.color        [0 0 0 255 220 20 20 255]
+set tcp.volume.label.font   [2]
+set tcp.volume.label.color  [0 0 0]
 
-set tcp.pan.color [0 0 0 255 220 20 20 255]
-set tcp.pan.label.color [0 0 0]
-set tcp.pan.label.font [2]
+set tcp.pan.color           [0 0 0 255 220 20 20 255]
+set tcp.pan.label.color     [0 0 0]
+set tcp.pan.label.font      [2]
 
-set tcp.meter.readout.color [255 255 255]
-; scale labels filled/unfilled colors
-set tcp.meter.scale.color.lit.bottom [0 0 0 255]
-set tcp.meter.scale.color.lit.top [0 0 0 255]
-set tcp.meter.scale.color.unlit.bottom [255 255 255 255]
-set tcp.meter.scale.color.unlit.top [255 255 255 255]
+set tcp.meter.readout.color             [255 255 255]
+
+; **** scale labels filled/unfilled colors
+set tcp.meter.scale.color.lit.bottom    [0 0 0 255]
+set tcp.meter.scale.color.lit.top       [0 0 0 255]
+set tcp.meter.scale.color.unlit.bottom  [255 255 255 255]
+set tcp.meter.scale.color.unlit.top     [255 255 255 255]
 
 
 ; >>>> ROW_1
-set tcp.recarm   + [track_idx_off] [tcp_pad_left row1_y 30 30]
+set tcp.recarm   + [track_idx_off]  [tcp_pad_left row1_y 30 btn_h2]
 
-set label_off    + tcp.recarm{l} tcp.recarm{w}
-set label_w      - - - - - tcp_w tcp.meter{w} label_off{0} tcp_pad_left tcp_pad_left
-set tcp.label    + + [label_off] - [0 0 label_w{0}] [0 0 recmon_w2] [0 row1_y -4 label_h 0 0 1 0]
+set label_off    h<44   + [track_idx_off] [tcp_pad_left]  + tcp.recarm{l} tcp.recarm{w}
+set label_w      - - - - - - tcp_w  tcp.meter{w}  label_off{0}  * 2 tcp_pad_left  recmon_w
+set label_w      h<44   + - label_w  * 2 mute_solo_w  recmon_w
+set label_w      w<243  + + label_w  recmon_w  tcp_pad_left
 
-set tcp.recmon   + - - - [tcp_w] [tcp.meter{w}] [tcp_pad_right] [recmon_w2] [0 row1_y recmon_w2 30 1 0 1 0]
+set tcp.label    + + [label_off]  [0 0 label_w{0}]  [0 row1_y -4 label_h 0 0 1 0]
+set tcp.recmon   + - - - [tcp_w]  [tcp.meter{w}]    [tcp_pad_right]  [recmon_w]  [0 row1_y recmon_w btn_h2 1 0 1 0]
 
 
 ; >>>> ROW_2
-set tcp.mute     + [track_idx_off] [tcp_pad_left row2_y mute_solo_w2 btn_h2]
-set tcp.solo     + + [tcp.mute{l}] [tcp.mute{w}] [0 row2_y mute_solo_w2 btn_h2]
+set tcp.mute     +   [track_idx_off] [tcp_pad_left row2_y mute_solo_w btn_h2]
+set tcp.solo     + + [tcp.mute{l}]   [tcp.mute{w}] [0 row2_y mute_solo_w btn_h2]
 
-set tcp.fx       + + [tcp.solo{l}] [tcp.solo{w}] [tcp_pad_left row2_y fx_w2 btn_h2]
-set tcp.fxbyp    + + [tcp.fx{l}] [tcp.fx{w}] [0 row2_y 24 btn_h2]
+set tcp.fx       + + [tcp.solo{l}]   [tcp.solo{w}]  [tcp_pad_left row2_y fx_w btn_h2]
+set tcp.fxbyp    + + [tcp.fx{l}]     [tcp.fx{w}]    [0 row2_y 24 btn_h2]
 
-set tcp.env      + + [tcp.fxbyp{l}] [tcp.fxbyp{w}] [tcp_pad_left row2_y env_w2 btn_h2]
-set tcp.io       + + [tcp.env{l}] [tcp.env{w}] [tcp_pad_left row2_y io_w2 btn_h2]
+set tcp.env      + + [tcp.fxbyp{l}]  [tcp.fxbyp{w}]  [tcp_pad_left row2_y env_w btn_h2]
+set tcp.io       + + [tcp.env{l}]    [tcp.env{w}]    [tcp_pad_left row2_y io_w btn_h2]
 
 
 ; >>>> ROW_3
-set tcp.recmode  + [track_idx_off] [tcp_pad_left row3_y 39 btn_h]
-set tcp.fxin     + + [tcp.recmode{l}] [tcp.recmode{w}] [tcp_pad_left row3_y 29 btn_h]
-set tcp.recinput + + [tcp.fxin{l}] [tcp.fxin{w}] [0 row3_y 100 btn_h]
-set tcp.phase    + + [tcp.recinput{l}] [tcp.recinput{w}] [tcp_pad_left row3_y 16 btn_h]
+set tcp.recmode  +   [track_idx_off]   [tcp_pad_left row3_y 39 btn_h]
+set tcp.fxin     + + [tcp.recmode{l}]  [tcp.recmode{w}]   [tcp_pad_left row3_y 29 btn_h]
+set tcp.recinput + + [tcp.fxin{l}]     [tcp.fxin{w}]      [0 row3_y 100 btn_h]
+set tcp.phase    + + [tcp.recinput{l}] [tcp.recinput{w}]  [tcp_pad_left row3_y 16 btn_h]
 
 
 ; >>>> ROW_4
-set volume_w     - - - - tcp_w track_idx_off tcp.meter{w} tcp_pad_left tcp_pad_left
-set tcp.volume   + - [track_idx_off 0 volume_w{0}] [0 0 pan_w2] [tcp_pad_left row4_y -10 btn_h2 0 0 1 0]
+set volume_w     - - - - tcp_w track_idx_off tcp.meter{w} * 2 tcp_pad_left pan_w
+set volume_w     w<243  + + volume_w  pan_w tcp_pad_left
+set tcp.volume   + [track_idx_off 0 volume_w{0}]  [tcp_pad_left row4_y -10 btn_h2 0 0 1 0]
 
-set tcp.pan      + - - - [tcp_w] [tcp.meter{w}] [tcp_pad_right] [pan_w2] [0 row4_y pan_w2 btn_h2 1 0 1 0]
+set tcp.pan      + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [pan_w]  [0 row4_y pan_w btn_h2 1 0 1 0]
 
 
 ; Hide
-set tcp.io            w<320 [0]
+set tcp.io            w<320  [0]
 
-set tcp.env           w<263 [0]
-set tcp.phase         w<263 [0]
+set tcp.env           w<263  [0]
+set tcp.phase         w<263  [0]
 
-set tcp.recmon        w<243 [0]
-set tcp.label         w<243  + + [label_off] [0 0 label_w{0}] [0 row1_y 2 label_h 0 0 1 0]
-set tcp.recinput      w<243 [0]
-set tcp.fxin          w<243 [0]
-set tcp.pan           w<243 [0]
-set tcp.volume        w<243  + [track_idx_off 0 volume_w{0}] [tcp_pad_left row4_y -4 btn_h2 0 0 1 0]
+set tcp.recmon        w<243  [0]
+set tcp.recinput      w<243  [0]
+set tcp.fxin          w<243  [0]
+set tcp.pan           w<243  [0]
 
-set tcp.fx            w<193 [0]
-set tcp.fxbyp         w<193 [0]
-set tcp.pan.label     w<193 [0]
+set tcp.fx            w<193  [0]
+set tcp.fxbyp         w<193  [0]
+set tcp.pan.label     w<193  [0]
 
-set tcp.recarm        ?mainCollapse{0} [0]
-set tcp.label         ?mainCollapse{0} [0]
-set tcp.mute          ?mainCollapse{0} [0]
-set tcp.solo          ?mainCollapse{0} [0]
-set tcp.recmode       ?mainCollapse{0} [0]
-set tcp.volume        ?mainCollapse{0} [0]
-set tcp.volume.label  ?mainCollapse{0} [0]
+set tcp.recarm        ?mainCollapse{0}  [0]
+set tcp.label         ?mainCollapse{0}  [0]
+set tcp.mute          ?mainCollapse{0}  [0]
+set tcp.solo          ?mainCollapse{0}  [0]
+set tcp.recmode       ?mainCollapse{0}  [0]
+set tcp.volume        ?mainCollapse{0}  [0]
+set tcp.volume.label  ?mainCollapse{0}  [0]
 
 
+set tcp.volume.label  h<155  [0]
+set tcp.pan.label     h<155  [0]
 
-set tcp.volume.label  h<155 [0]
-set tcp.pan.label     h<155 [0]
+set tcp.recmode       h<138  [0]
+set tcp.fxin          h<138  [0]
+set tcp.recinput      h<138  [0]
+set tcp.phase         h<138  [0]
 
-set tcp.recmode       h<138 [0]
-set tcp.fxin          h<138 [0]
-set tcp.recinput      h<138 [0]
-set tcp.phase         h<138 [0]
+set tcp.volume        h<112  [0]
+set tcp.pan           h<112  [0]
 
-set tcp.volume        h<112 [0]
-set tcp.pan           h<112 [0]
+set tcp.mute          h<75   [0]
+set tcp.solo          h<75   [0]
+set tcp.fx            h<75   [0]
+set tcp.fxbyp         h<75   [0]
+set tcp.env           h<75   [0]
+set tcp.io            h<75   [0]
 
-set tcp.mute          h<75 [0]
-set tcp.solo          h<75 [0]
-set tcp.fx            h<75 [0]
-set tcp.fxbyp         h<75 [0]
-set tcp.env           h<75 [0]
-set tcp.io            h<75 [0]
+set tcp.recarm        h<44   [0]
+set tcp.recmon        h<44   [0]
 
-set tcp.recarm        h<44 [0]
-set tcp.recmon        h<44 [0]
+set tcp.label         h<44  w<243  [0]
 
-set label_off         h<44  + [track_idx_off] [tcp_pad_left]
-set label_w           h<44  - - - - - - tcp_w tcp.meter{w} label_off{0} tcp_pad_left tcp_pad_right mute_solo_w2 mute_solo_w2
-set tcp.label         h<44  w<243 [0]  + [0 0 label_w{0}] [label_off row1_y 0 29 0 0 1 0]
-;set tcp.label         h<44  ?mainCollapse{0} [0]  + [0 0 label_w{0}] [label_off row1_y 0 29 0 0 1 0]
-;set tcp.label         h<44  w<243   + + * 2 [0 0 mute_solo_w2] [0 0 3] tcp.label
+; **** stick to the right edge
+set tcp.solo          h<44   + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [mute_solo_w]  [0 row1_y mute_solo_w btn_h2 1 0 1 0]
+set tcp.mute          h<44   - [tcp.solo{l} row1_y mute_solo_w btn_h2 1 0 1 0]  [mute_solo_w]
 
-;set tcp.solo          h<44  w<243 [0]  + - - - [tcp_w] [tcp.meter{w}] [tcp_pad_right] [mute_solo_w2] [0 row1_y mute_solo_w2 30 1 0 1 0]
-;set tcp.mute          h<44  w<243 [0]  + - [tcp.solo{l}] [mute_solo_w2] [0 row1_y mute_solo_w2 30 1 0 1 0]
-
-set tcp.solo          h<44  + - - - [tcp_w] [tcp.meter{w}] [tcp_pad_right] [mute_solo_w2] [0 row1_y mute_solo_w2 30 1 0 1 0]
-set tcp.mute          h<44  + - [tcp.solo{l}] [mute_solo_w2] [0 row1_y mute_solo_w2 30 1 0 1 0]
-
-set tcp.mute          h<44 w<243 ?mainCollapse{0} [0]  + + [track_idx_off] [tcp_pad_left] [0 row1_y mute_solo_w2 30]
-set tcp.solo          h<44 w<243 ?mainCollapse{0} [0]  + + [tcp.mute{l}] [tcp.mute{w}] [0 row1_y mute_solo_w2 30]
+; **** restore the left edge anchor
+set tcp.mute          h<44 w<243 ?mainCollapse{0}  [0]  + + [track_idx_off]  [tcp_pad_left]  [0 row1_y mute_solo_w btn_h2]
+set tcp.solo          h<44 w<243 ?mainCollapse{0}  [0]  + + [tcp.mute{l}]    [tcp.mute{w}]   [0 row1_y mute_solo_w btn_h2]
 
 
 
