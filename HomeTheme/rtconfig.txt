@@ -561,11 +561,11 @@ set tcp.solo          h<44 w<243 ?mainCollapse{0}  [0]  + + [tcp.mute{x}]    [tc
 
 
 
-; *******************************************************************************************************************
 
+
+; *******************************************************************************************************************
 #<
 #>------------------------- MASTER TRACK CONTROL PANEL --------------------------------
-
 
 macro calcMasterTcpSecs scale
     set element_h                               * scale 20
@@ -648,10 +648,14 @@ macro drawMasterTcp scale
     set master.tcp.fxparm.margin                * scale [3 0 3 0 0 14]
 endMacro
 
+
 paramPair   tcp_MeterSize                   4 4 10 22 40 80 160 320
 paramPair   tcp_MeterLoc                    17 0 1 2
+
 set scale 1
 calcMasterTcpSecs 1
+
+
 
 resetHides
 doHideLogic     master_pan_group    12
@@ -659,53 +663,102 @@ doHideLogic     values              15
 doHideLogic     meter_values        16
 
 ;    element                    size    padding?
-then master.tcp.label           50          0
-then master.tcp.io              34          1
-then master_fx_group            36          1
-then master.tcp.env             41          1
-then master_pan_group       mTcp_PanSize    1
-then master.tcp.mono            50          1
+;then master.tcp.label           50          0
+;then master.tcp.io              34          1
+;then master_fx_group            36          1
+;then master.tcp.env             41          1
+;then master_pan_group       mTcp_PanSize    1
+;then master.tcp.mono            50          1
 
 drawMasterTcp 1
 
-    Layout "A"
-        set scale 1
-        calcMasterTcpSecs 1
-        then master.tcp.label           50          0
-        then master.tcp.io              34          1
-        then master_fx_group            36          1
-        then master.tcp.env             41          1
-        then master_pan_group       mTcp_PanSize    1
-        then master.tcp.mono            50          1
-        set master.tcp.label  .
-        drawMasterTcp 1
-    EndLayout
+set master_tcp_pad  6
+set mrow1_y  6
+set mrow2_y  30
+set mrow3_y  70
+set mrow4_y  106
 
-    Layout "150%_A" "150"
-        set scale 1.5
-        calcMasterTcpSecs 1.5
-        then master.tcp.label           50          0
-        then master.tcp.io              34          1
-        then master_fx_group            36          1
-        then master.tcp.env             41          1
-        then master_pan_group       mTcp_PanSize    1
-        then master.tcp.mono            50          1
-        set master.tcp.label  .
-        drawMasterTcp 1.5
-    EndLayout
 
-    Layout "200%_A" "200"
-        set scale 2
-        calcMasterTcpSecs 2
-        then master.tcp.label           50          0
-        then master.tcp.io              34          1
-        then master_fx_group            36          1
-        then master.tcp.env             41          1
-        then master_pan_group       mTcp_PanSize    1
-        then master.tcp.mono            50          1
-        set master.tcp.label  .
-        drawMasterTcp 2
-    EndLayout
+set meter_sec  + - [w] [35] [0 0 31 h]
+set meter_sec  w<153  - [23 0 w h] [0 0 23]
+
+
+set master.tcp.meter   meter_sec
+
+
+; >>>> Fonts/Colors
+set master.tcp.volume.label.color  [220 220 220]
+set master.tcp.volume.label.font   [2]
+
+set master.tcp.pan.label.color     [220 220 220]
+set master.tcp.pan.label.font      [2]
+
+set master.tcp.label.color         [220 220 220]
+
+
+; >>>> ROW_1
+set master.tcp.label         [8 8 60 10]
+set master.tcp.label.margin  [0 0 0 0 0]
+
+set master.tcp.mono     + - [w] [master.tcp.meter{w}] [-66 4 50 btn_h]
+
+
+; >>>> ROW_2
+set master.tcp.mute     [master_tcp_pad mrow2_y mute_solo_w btn_h2]
+set master.tcp.solo     + + [master.tcp.mute{x}]   [master.tcp.mute{w}] [0 mrow2_y mute_solo_w btn_h2]
+
+set master.tcp.fx       + + [master.tcp.solo{x}]   [master.tcp.solo{w}]  [master_tcp_pad mrow2_y fx_w btn_h2]
+set master.tcp.fxbyp    + + [master.tcp.fx{x}]     [master.tcp.fx{w}]    [0 mrow2_y 24 btn_h2]
+
+set master.tcp.env      + + [master.tcp.fxbyp{x}]  [master.tcp.fxbyp{w}]  [master_tcp_pad mrow2_y env_w btn_h2]
+set master.tcp.io       + + [master.tcp.env{x}]    [master.tcp.env{w}]    [master_tcp_pad mrow2_y io_w btn_h2]
+
+
+; >>>> ROW_3
+set mvolume_w           - - - w master.tcp.meter{w} 20  w<241  0  + pan_w 6
+set master.tcp.volume   [6 mrow3_y mvolume_w{0} btn_h2]
+set master.tcp.pan      + + + [master.tcp.volume{x}] [master.tcp.volume{w}] [6 master.tcp.volume{y} pan_w btn_h2]
+
+
+; >>>> ROW_4
+set master.tcp.volume.label      [8 mrow4_y 80 20]
+set master.tcp.pan.label         + - [w] [master.tcp.meter{w}] [-100 mrow4_y 80 20]
+
+
+; >>>> Hide
+set master.tcp.io             w<297  [0]
+set master.tcp.env            w<241  [0]
+set master.tcp.pan            w<241  [0]
+set master.tcp.pan.label      w<241  [0]
+set master.tcp.mono           w<174  [0]
+set master.tcp.fx             w<174  [0]
+set master.tcp.fxbyp          w<174  [0]
+
+set master.tcp.label          w<153  [0]
+set master.tcp.mute           w<153  [0]
+set master.tcp.solo           w<153  [0]
+set master.tcp.volume         w<153  [0]
+set master.tcp.volume.label   w<153  [0]
+
+set master.tcp.label          w<153  [4 0 8 h]
+set master.tcp.label.margin   w<153  [0 0 0 0 0.5]
+
+
+set master.tcp.volume.label   h<129  [0]
+set master.tcp.pan.label      h<129  [0]
+
+set master.tcp.volume         h<106  [0]
+set master.tcp.pan            h<106  [0]
+
+set master.tcp.mute           h<66  [0]
+set master.tcp.solo           h<66  [0]
+set master.tcp.fx             h<66  [0]
+set master.tcp.fxbyp          h<66  [0]
+set master.tcp.env            h<66  [0]
+set master.tcp.io             h<66  [0]
+
+
+
 
 #<
 #> -------------------------- ENVELOPE CONTROL PANELS ---------------------------------
@@ -838,6 +891,8 @@ Layout "A"
 
 
 EndLayout
+
+
 
 #<
 #>---------------------------------- THE MIXER ----------------------------------------
@@ -1088,6 +1143,8 @@ Layout "C"
 
 EndLayout
 
+
+
 #<
 #>--------------------------------- MASTER MIXER --------------------------------------
 
@@ -1186,6 +1243,9 @@ drawMasterMcp 1
         set master.mcp.label  .
         drawMasterMcp 2
     EndLayout
+
+
+
 
 #<
 #>---------------------------------- TRANSPORT ----------------------------------------
@@ -1350,6 +1410,8 @@ Layout "200%_A" "200"
     drawTransport 2.0
 EndLayout
 
+
+
 #<
 #>------------------------------- DPI TRANSLATION -------------------------------------
 
@@ -1437,3 +1499,13 @@ layout_dpi_translate    ''          1.34    '150%_A'
 layout_dpi_translate    ''          1.74    '200%_A'
 
 #<
+
+
+
+;clear tcp.*
+;clear master.tcp.*
+;clear envcp.*
+;clear mcp.*
+;clear master.mcp.*
+;clear trans.*
+
