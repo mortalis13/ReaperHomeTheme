@@ -398,7 +398,6 @@ set meter_sec  + - meter_sec [0 0 12 0] [8]
 set meter_sec  ?mainCollapse{0}  - [main_sec 0 w h] [0 0 main_sec{0}]
 
 ;-------------
-set tcp.label  .
 drawTcp
 
 
@@ -813,6 +812,7 @@ clear envcp.*
 front       envcp.fader
 
 
+;-------------
 calcEnvSecs
 
 ;    element                size    padding?
@@ -826,6 +826,7 @@ envThen envcp.hide          36          1
 
 set values_sec   h<valuesFlipH{0}   - [values_sec values_sec values_sec values_sec] [0 3]
 
+;-------------
 drawEnvcp
 
 set envcp.value.font  [2]
@@ -982,6 +983,7 @@ macro drawMcp scale
 
 endMacro
 
+
 set hide_inputFX                [400]   ; height below which input effects is hidden.
 set hide_input                  [350]   ; height below which input dropdown is hidden.
 set hide_pan_labels             [320]   ; height below which pan labels are hidden.
@@ -1003,83 +1005,21 @@ doModeLogic sidebarMode     25
 doModeLogic narrowMode      26
 doModeLogic meterExpMode    27
 doModeLogic labelsMode      28
+
 paramPair mcp_meterExp      29 0 2 4 8
 paramPair mcp_border        30 0 1 2 3 4
+
 drawMcp 1
 
-Layout "A"
-    set mcp.label  .
-    drawMcp 1
 
-    Layout "150%_A" "150"
-        set mcp.label  .
-        drawMcp 1.5
-        ; ---- scaling error cleanup ----
-        set mcp.volume.label        + mcp.volume.label [-1]
-        ; -------------------------------
-    EndLayout
+set mcp.volume.label.color    [240 240 240]
+set mcp.pan.label.color       ?track_selected  [50 50 50]  [240 240 240]
 
-    Layout "200%_A" "200"
-        set mcp.label  .
-        drawMcp 2.0
-    EndLayout
-
-EndLayout
-
-Layout "B"
-    set sidebarMode             0
-    set narrowMode              0
-    set meterExpMode            0
-    set labelsMode              0
-    doModeLogic sidebarMode     48
-    doModeLogic narrowMode      49
-    doModeLogic meterExpMode    50
-    doModeLogic labelsMode      51
-    paramPair mcp_meterExp      52 0 2 4 8
-    paramPair mcp_border        53 0 1 2 3 4
-    drawMcp 1
-
-    Layout "150%_B" "150"
-        set mcp.label  .
-        drawMcp 1.5
-        ; ---- scaling error cleanup ----
-        set mcp.volume.label        + mcp.volume.label [-1]
-    EndLayout
-
-    Layout "200%_B" "200"
-        set mcp.label  .
-        drawMcp 2.0
-    EndLayout
-
-EndLayout
-
-Layout "C"
-    set sidebarMode             0
-    set narrowMode              0
-    set meterExpMode            0
-    set labelsMode              0
-    doModeLogic sidebarMode     71
-    doModeLogic narrowMode      72
-    doModeLogic meterExpMode    73
-    doModeLogic labelsMode      74
-    paramPair mcp_meterExp      75 0 2 4 8
-    paramPair mcp_border        76 0 1 2 3 4
-    drawMcp 1
-
-
-    Layout "150%_C" "150"
-        set mcp.label  .
-        drawMcp 1.5
-        ; ---- scaling error cleanup ----
-        set mcp.volume.label        + mcp.volume.label [-1]
-    EndLayout
-
-    Layout "200%_C" "200"
-        set mcp.label  .
-        drawMcp 2.0
-    EndLayout
-
-EndLayout
+set mcp.meter.readout.color             [240 240 240]
+set mcp.meter.scale.color.lit.bottom    [240 240 240]
+set mcp.meter.scale.color.lit.top       [240 240 240]
+set mcp.meter.scale.color.unlit.bottom  [240 240 240]
+set mcp.meter.scale.color.unlit.top     [240 240 240]
 
 
 
