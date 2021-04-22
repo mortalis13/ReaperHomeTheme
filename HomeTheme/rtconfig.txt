@@ -744,14 +744,6 @@ set master.tcp.io             h<66   [0]
 #<
 #> -------------------------- ENVELOPE CONTROL PANELS ---------------------------------
 
-paramPair   EnvcpLabelSize                  21 0 20 50 80 110 140 170
-paramPair   EnvcpVolSize                    23 20 40 70 100 130 160 190
-set EnvLabelAutoMeasured                    param22
-set EnvFolderIndent                         param24
-
-clear envcp.*
-front       envcp.fader
-
 macro calcEnvSecs scale
     set envcp.size                              * scale [300 100]
     set element_h                               * scale 20
@@ -798,18 +790,6 @@ macro envThen element width use_padding
     set previous_element element
 endmacro
 
-
-calcEnvSecs
-
-;    element                size    padding?
-envThen envcp.arm           20          0
-envThen envcp.bypass        15          0
-envThen envcp.label   envcp_labelSize   0
-envThen envcp.fader    EnvcpVolSize     0
-envThen envcp.mod       addCont{0}  addCont{1}
-envThen envcp.learn     addCont{0}  addCont{1}
-envThen envcp.hide          36          1
-
 macro drawEnvcp scale
     set envcp.label.color                       [184 184 184]
         set envcp.label.margin                  * scale [2 0 2 0 0]
@@ -823,11 +803,33 @@ macro drawEnvcp scale
         set envcp.fader.fadermode               envcp.fader{w}>env_fader_w{0} [0] [1]
 endMacro
 
+
+set EnvcpLabelSize         140
+set EnvcpVolSize           20
+set EnvLabelAutoMeasured   100
+set EnvFolderIndent        1
+
+clear envcp.*
+front       envcp.fader
+
+
+calcEnvSecs
+
+;    element                size    padding?
+envThen envcp.arm           20          0
+envThen envcp.bypass        15          0
+envThen envcp.label   envcp_labelSize   0
+envThen envcp.fader    EnvcpVolSize     0
+envThen envcp.mod       addCont{0}  addCont{1}
+envThen envcp.learn     addCont{0}  addCont{1}
+envThen envcp.hide          36          1
+
+set values_sec   h<valuesFlipH{0}   - [values_sec values_sec values_sec values_sec] [0 3]
+
 drawEnvcp
 
-
 set envcp.value.font  [2]
-set envcp.value  w<70  [0]
+set envcp.value       w<70  [0]
 
 
 
@@ -842,7 +844,6 @@ macro doModeLogic variable paramIdx
 endmacro
 
 macro drawMcp scale
-
     set hide_inputFX_s                          * scale hide_inputFX
     set hide_input_s                            * scale hide_input
     set hide_pan_labels_s                       * scale hide_pan_labels
