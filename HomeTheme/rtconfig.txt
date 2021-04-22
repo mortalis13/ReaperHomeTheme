@@ -897,7 +897,7 @@ macro drawMcp scale
         set mcp.sendlist.font                   scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
         set mcp.sendlist.margin                 * scale [4 0 4 0 0 0 14]
         set mcp.fxparm.font                     scale{0}==1 [1 24 0 0 -1] scale{0}==1.5 [6 36 0 0 -4] [11 48 0 0 -6]
-        set mcp.fxparm.font             + . os_type==1 * scale [0 0 0 0 3] [0]
+        set mcp.fxparm.font                     + . os_type==1 * scale [0 0 0 0 3] [0]
         set mcp.fxparm.margin                   * scale [2 0 4 0 0 14]
     set mcp.fx                                  + [fx_sec 0 nchan_offs_twothird{0}] * scale ?narrowMode{0} [4 7 28 20] [7 7 43 20]
     set mcp.fxbyp                               + + [mcp.fx mcp.fx nchan_offs_third{0}] [mcp.fx{2}] * scale ?narrowMode{0} [0 0 19 20] [0 0 29 20]
@@ -1016,8 +1016,6 @@ set mcp.volume.label.color    [240 240 240]
 set mcp.pan.label.color       ?track_selected  [50 50 50]  [240 240 240]
 
 set mcp.meter.readout.color             [240 240 240]
-set mcp.meter.scale.color.lit.bottom    [240 240 240]
-set mcp.meter.scale.color.lit.top       [240 240 240]
 set mcp.meter.scale.color.unlit.bottom  [240 240 240]
 set mcp.meter.scale.color.unlit.top     [240 240 240]
 
@@ -1101,26 +1099,19 @@ macro drawMasterMcp scale
         set master.mcp.sendlist.font                scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
         set master.mcp.sendlist.margin              mcp.sendlist.margin
         set master.mcp.fxparm.font                  scale{0}==1 [1 24 0 0 -1] scale{0}==1.5 [6 36 0 0 -4] [11 48 0 0 -6]
-        set master.mcp.fxparm.font          + . os_type==1 * scale [0 0 0 0 3] [0]
+        set master.mcp.fxparm.font                  + . os_type==1 * scale [0 0 0 0 3] [0]
         set master.mcp.fxparm.margin                mcp.fxparm.margin
 endmacro
 
 drawMasterMcp 1
 
-    Layout "A"
-    set master.mcp.label  .
-    drawMasterMcp 1
-    EndLayout
 
-    Layout "150%_A" "150"
-        set master.mcp.label  .
-        drawMasterMcp 1.5
-    EndLayout
+set master.mcp.volume.label.color              [240 240 240]
+set master.mcp.pan.label.color                 [240 240 240]
 
-    Layout "200%_A" "200"
-        set master.mcp.label  .
-        drawMasterMcp 2
-    EndLayout
+set master.mcp.meter.readout.color             [240 240 0]
+set master.mcp.meter.scale.color.unlit.bottom  [220 220 220]
+set master.mcp.meter.scale.color.unlit.top     [220 220 220]
 
 
 
