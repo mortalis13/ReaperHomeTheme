@@ -1120,53 +1120,42 @@ set master.mcp.meter.scale.color.unlit.top     [220 220 220]
 #<
 #>---------------------------------- TRANSPORT ----------------------------------------
 
-;----- tune by eye @1x -----
-set status_min              300     ; the size below which status readout looks weird
-set selection_min           180     ; the size below which selection readout looks weird
-;---------------------------
-set text_color              [200 200 200]   ; the color of the text
-
-
 ;returns [padding x, padding y, width, height, width + padding x]
 macro size element   px  py  w  h
-  set size_##element * scale + [px py w h px] [0 0 0 0 w]
+  set size_##element  + [px py w h px] [0 0 0 0 w]
 endmacro
 
-macro drawTransport scale
+macro drawTransport
     clear trans.*
-    set trans.size                  * scale [100 100]
+    set trans.size                  [100 100]
+    
+    set status_min                  300     ; the size below which status readout looks weird
+    set text_color                  [200 200 200]   ; the color of the text
+    
     set trans_rateSize              170
-    set trans_rateSize              * scale trans_rateSize{0}
-    set trans_rateSize_padded       + trans_rateSize{0} * scale 3
-    set size_rate                   + * scale [3 1 0 44] [0 0 trans_rateSize{0} 0 trans_rateSize_padded{0}]
+    set trans_rateSize              trans_rateSize{0}
+    set trans_rateSize_padded       + trans_rateSize{0} 3
+    set size_rate                   + [3 1 0 44] [0 0 trans_rateSize{0} 0 trans_rateSize_padded{0}]
 
     ; Set absolute sizes...
-    ;     element   px  py  w   h
-    size  rew       4   10  29  29
-    size  fwd       0   10  28  29
-    size  rec       0   7   34  35
-    size  play      0   7   33  35
-    size  repeat    0   10  27  29
-    size  stop      0   10  29  29
-    size  pause     0   10  29  29
+    ;     element     px  py   w    h
+    size  rew         4   10   29   29
+    size  fwd         0   10   28   29
+    size  rec         0   7    34   35
+    size  play        0   7    33   35
+    size  repeat      0   10   27   29
+    size  stop        0   10   29   29
+    size  pause       0   10   29   29
     
-    size  automode  2   0   54  44
+    size  automode    2   0    54   44
     
-    size  status    6   2   450 44
-    size  bpm       0   1   54  44
-    size  timesig   2   1   50  44
-    size  selection 0   10  350 24
+    size  status      6   2    450  44
+    size  bpm         0   1    54   44
+    size  timesig     2   1    50   44
+    size  selection   0   10   350  24
 
-    set row_height                  * scale [48]
+    set row_height                  [48]
     set row_height_x2               * 2 row_height
-    set row_height_x3               * 3 row_height
-    set row_height_x4               * 4 row_height
-
-    set scaleMargin                 + * scale [1 1 1 1] [0 0 0 0 1]
-
-    set showRate                    ?trans_flags&2 1 0
-    set size_rate                   !showRate{0} [0 0 0 0 0] .
-    set size_timesig                ?trans_flags&4 . [0 0 0 0 0]
 
     ; size the sections
     set sec_buttons_width           + + + + + + size_rew{4} size_fwd{4} size_stop{4} size_play{4} size_pause{4} size_rec{4} size_repeat{4}
@@ -1182,76 +1171,40 @@ macro drawTransport scale
     set w_bpm_sel                   + + sec_proj_width  size_selection{4}  [20]
 
     set w_stretch                   - all_width w
-    set sec_status_width            - h<row_height_x2{0} w<all_width{0}  - size_status{4} * w_stretch 0.6 size_status{4}  size_status{4}  size_status{0}
+    set sec_status_width            - h<row_height_x2{0} w<all_width{0}  - size_status{4}  * w_stretch 0.6  size_status{4}  size_status{4}  size_status{0}
     
-    ;set sec_sel_width               h<row_height_x2{0} w<all_width{0} - size_selection{4} * w_stretch 0.4 size_selection{4} size_selection{4}
     set sec_sel_width               h<row_height_x2{0}  size_selection{4} size_selection{4}
     set sec_sel                     [0 0 sec_sel_width{0}]
 
     ; layout the sections
     set sec_status                  [sec_buttons{2} 0 sec_status_width{0} size_status]
-    set sec_status                  sec_sel{2}<selection_min{0} + sec_status [0 0 sec_sel] ; proj section is going to be hidden, so steal its width
-    ;set sec_status                  sec_status_width{0}<status_min{0} [0] .
     set sec_status                  + sec_status  w<all_width{0} h<row_height_x2{0}  [10] [20] [20]
-    
-    ;set sec_proj                    [0 0 sec_proj{2} sec_proj]
-    ;set sec_proj                    - [w 0 sec_proj{2} sec_proj] [sec_proj{2}]
-    ;set sec_proj                    h<row_height_x2{0} w<buttons_proj_width{0} [0] . . ; single row, hide proj section if it still doesn't fit
-    
-    set sec_sel                     sec_sel{2}<selection_min{0} [0] - [w size_selection sec_sel size_selection] [sec_sel{2}]
+    set sec_sel                     - [w size_selection sec_sel size_selection] [sec_sel{2}]
 
-        ;; jumping rows when panel is narrow
-        ;; ...2 rows
-        ;set sec_sel                 w<all_width{0} h<row_height_x2{0}  .  + [0 row_height{0}] [0 sec_sel sec_sel sec_sel]             .
-        ;set sec_proj                w<all_width{0} h<row_height_x2{0}  .  + [sec_sel row_height{0}] [sec_sel{2} 0 sec_proj sec_proj]  .
-        ;; ...4 rows
-        ;set row_1_width             + sec_buttons_width sec_status_width
-        ;set row_2_width             + sec_proj_width sec_sel_width
-        ;set 2rows_max               row_1_width{0}>row_2_width{0} row_1_width{0} row_2_width{0}
-        ;set sec_status_width        w<sec_status_width{0} - w size_status{0}
-        ;set sec_status              w<2rows_max{0} [0 row_height{0} sec_status_width{0} size_status] .
-        ;set sec_sel                 w<sec_sel{2} [sec_sel sec_sel w sec_sel]
-        ;set sec_sel                 w<2rows_max{0} + [0 row_height_x2{0}] [size_selection size_selection sec_sel size_selection] .
-        ;set sec_proj                w<sec_proj{2} [sec_proj sec_proj w sec_proj]
-        ;;set sec_proj                w<2rows_max{0} [0 row_height_x3{0} sec_proj sec_proj] .
-
-        ;set trans_min_width         h>row_height{0} sec_status_width{0}<sec_proj_width{0}  sec_proj_width{0}  sec_status_width{0}  + * scale [216] [0 row_height{0}]
-        set trans_min_width          sec_proj_width{0}
-        set trans.size.dockedheight  row_height{0}
-        set trans.size.minmax        [trans_min_width row_height{0} 10000 row_height_x2{0}]
+    set trans_min_width             sec_proj_width{0}
+    set trans.size.dockedheight     row_height{0}
+    set trans.size.minmax           [trans_min_width row_height{0} 10000 row_height_x2{0}]
     
+    ; multi-rows layout
+    set centered_bpm                w<all_width{0}  h>=row_height_x2{0}  0  1  1
+    set sec_proj                    !centered_bpm{0}  + [0 row_height{0}] [6 sec_proj sec_proj sec_proj]
+    set sec_sel                     w<w_btn_stat_sel{0}  h>=row_height_x2{0}   +  - + [trans.status{x}] [trans.status{w}] [sec_sel{w}]   + [0 row_height{0}]  [0 sec_sel sec_sel sec_sel]
+    set sec_sel                     w<w_bpm_sel{0}  h>=row_height_x2{0}  [0]
+    set sec_status                  w<w_btn_stat{0} h>=row_height_x2{0}  - [sec_status sec_status sec_status sec_status]  + - [0 0 w_btn_stat] [0 0 w] [0 0 30]
+    set sec_status                  w<w_btn_stat{0} h>=row_height_x2{0}  sec_status{w}<status_min{0}  [0]
     
-    ; == multi-rows
-    set centered_bpm   w<all_width{0}  h>=row_height_x2{0}  0  1  1
-    set sec_proj       !centered_bpm{0}  + [0 row_height{0}] [6 sec_proj sec_proj sec_proj]
-    ;set sec_sel        w<w_btn_stat_sel{0}  h>=row_height_x2{0}  + [sec_proj{w} row_height{0}]  [sec_proj{x} sec_sel sec_sel sec_sel]
-    set sec_sel        w<w_btn_stat_sel{0}  h>=row_height_x2{0}   +  - + [trans.status{x}] [trans.status{w}] [sec_sel{w}]   + [0 row_height{0}]  [0 sec_sel sec_sel sec_sel]
-    set sec_sel        w<w_bpm_sel{0}  h>=row_height_x2{0}  [0]
-    set sec_status     w<w_btn_stat{0} h>=row_height_x2{0}  - [sec_status sec_status sec_status sec_status]  + - [0 0 w_btn_stat] [0 0 w] [0 0 30]
-    set sec_status     w<w_btn_stat{0} h>=row_height_x2{0}  sec_status{w}<status_min{0}  [0]
-    
-    
-    ; transport center
-    set transCenter             !sec_sel{2} 0 w<all_width{0} h>row_height{0} 0 ?trans_flags&1 1 0 ?trans_flags&1 1 0
-    set sec_buttons_center      * 0.5 - w +  + + sec_buttons_width{0} sec_status_width{0} sec_proj_width{0} sec_sel_width{0}
-    set sec_buttons             ?transCenter{0} + sec_sel_width{0}>0 + [sec_sel_width{0}] [sec_buttons_center{0}] [0] [0 0 sec_buttons] .
-    set sec_status              ?transCenter{0} + [sec_buttons 0 sec_status size_status] [sec_buttons{2}] .
-    set sec_sel                 ?transCenter{0} [0 size_selection sec_sel size_selection] .
-
-    
-    ; == put status where selection previously was
-    set sec_status              sec_status_width{0}<status_min{0}  - [sec_sel -2 sec_sel sec_status] [0 0 20]
-    set sec_sel                 sec_status_width{0}<status_min{0}  [0]
-    
+    ; put status where selection previously was, if status is overlapped by the centered bpm block
+    set sec_status                  sec_status_width{0}<status_min{0}  - [sec_sel -2 sec_sel sec_status] [0 0 20]
+    set sec_sel                     sec_status_width{0}<status_min{0}  [0]
     
     ; draw content in sec_buttons
-    set trans.rew                   + [sec_buttons sec_buttons] [size_rew size_rew size_rew size_rew]
-    set trans.fwd                   + + [trans.rew sec_buttons] [size_rew{2}] [size_fwd size_fwd size_fwd size_fwd]
-    set trans.rec                   + + [trans.fwd sec_buttons] [size_fwd{2}] [size_rec size_rec size_rec size_rec]
-    set trans.play                  + + [trans.rec sec_buttons] [size_rec{2}] [size_play size_play size_play size_play]
-    set trans.repeat                + + [trans.play sec_buttons] [size_play{2}] [size_repeat size_repeat size_repeat size_repeat]
-    set trans.stop                  + + [trans.repeat sec_buttons] [size_repeat{2}] [size_stop size_stop size_stop size_stop]
-    set trans.pause                 + + [trans.stop sec_buttons] [size_stop{2}] [size_pause size_pause size_pause size_pause]
+    set trans.rew                   +   [sec_buttons sec_buttons]   [size_rew size_rew size_rew size_rew]
+    set trans.fwd                   + + [trans.rew sec_buttons]     [size_rew{2}]  [size_fwd size_fwd size_fwd size_fwd]
+    set trans.rec                   + + [trans.fwd sec_buttons]     [size_fwd{2}]  [size_rec size_rec size_rec size_rec]
+    set trans.play                  + + [trans.rec sec_buttons]     [size_rec{2}]  [size_play size_play size_play size_play]
+    set trans.repeat                + + [trans.play sec_buttons]    [size_play{2}]  [size_repeat size_repeat size_repeat size_repeat]
+    set trans.stop                  + + [trans.repeat sec_buttons]  [size_repeat{2}]  [size_stop size_stop size_stop size_stop]
+    set trans.pause                 + + [trans.stop sec_buttons]    [size_stop{2}]  [size_pause size_pause size_pause size_pause]
 
     ; draw content in sec_status
     set trans.status                + [sec_status sec_status sec_status sec_status] [size_status size_status]
@@ -1264,82 +1217,64 @@ macro drawTransport scale
       set trans.bpm.tap             sec_proj{2}==0 [0]  * [1 1 1 0.5] trans_bpm
       set trans.bpm.edit            sec_proj{2}==0 [0]  + trans.bpm.tap [0 trans.bpm.tap{h}]
     set trans.curtimesig            sec_proj{2}==0 [0] + [6] + + [trans_bpm sec_proj] [size_bpm{2}] [size_timesig size_timesig size_timesig size_timesig]
-      set trans.curtimesig.color    [. . . . 43 43 43 255]
     set trans.automode              sec_proj{2}==0 [0] + [6] + + [trans.curtimesig sec_proj]] [size_timesig{2}] [size_automode size_automode size_automode size_automode]
     set trans_rate                  + [6] + + [trans.automode sec_proj] [size_automode{2}] [size_rate size_rate size_rate size_rate]
       set rate_cutoff               - + trans_rate{0} trans_rate{2} w
       set trans_rate                rate_cutoff{0}>0 - trans_rate [0 0 rate_cutoff{0}] .
-      set rate_mode_change          * scale 200
-      set trans_rate_mode           1
-      set trans.rate                sec_proj{2}==0 [0] !showRate{0} [0 0 0 0] ?trans_rate_mode{0} + [trans_rate trans_rate] + [-3 0 0 0] * scale [52 0 100 44] * [1 1 1 0.5] trans_rate
-      set trans.rate.fader          sec_proj{2}==0 [0] !showRate{0} [0 0 0 0] ?trans_rate_mode{0} + [trans_rate trans_rate] * scale [3 3 40 40] + trans.rate [0 trans.rate{h}]
-      set trans.rate.fader.fadermode    ?trans_rate_mode{0} 1 0
-      set trans.rate.fader.color    [255 255 255 255]
-      set trans.rate.font           scale{0}==1 [1] scale{0}==1.5 [6] [11]
+      set trans.rate                sec_proj{2}==0 [0]   + [trans_rate trans_rate] + [-3 0 0 0] [52 0 100 44]
+      set trans.rate.fader          sec_proj{2}==0 [0]   + [trans_rate trans_rate] [3 3 40 40]
+      set trans.rate.fader.fadermode  1
 
     ; draw content in sec_sel
     set trans.sel                   sec_sel
 
-    set trans.margin                [0]
+    ; >>> Fonts/Colors/Margins
     set trans.curtimesig.color      + text_color [0 0 0 0 43 43 43 255]
-    set trans.status.margin         os_type==1 * scale [0 4 0 -4 0] [0 0 0 0 0]
-    set trans.bpm.tap.margin        [0 0 0 0 0.5]
-    set trans.bpm.edit.margin       [0 0 0 0 0.5]
-    set trans.bpm.edit.margin       [0 0 0 0 0.5]
-    set trans.bpm.edit.color        text_color
-    set trans.bpm.tap.color         text_color
-    set trans.rate.color            [130 130 130 255 0 0 0]
+    set trans.bpm.tap.color         [190 190 190]
+    set trans.bpm.edit.color        [230 230 230]
+    set trans.rate.fader.color      [255 255 255]
+    set trans.rate.color            text_color
     set trans.sel.color             text_color
-    set trans.sel.margin            * scaleMargin [4 0 4 0 1]
-    set trans.curtimesig.font       scale{0}==1 [1] scale{0}==1.5 [6] [11]
-    set trans.bpm.tap.font          scale{0}==1 [1] scale{0}==1.5 [6] [11]
-    set trans.bpm.edit.font         scale{0}==1 [1] scale{0}==1.5 [6] [11]
-    set trans.sel.font              scale{0}==1 [3] scale{0}==1.5 [8] [13]
+    
+    ; Ubuntu-Bold-12
+    set trans.sel.font              [4]
+    set trans.bpm.tap.font          [4]
+    set trans.bpm.edit.font         [4]
+    set trans.curtimesig.font       [4]
+    ; Tahoma-Bold-10
+    set trans.rate.font             [3]
+    
+    set trans.status.margin         os_type==1  [0 4 0 -4 0] [0 0 0 0 0]
+    set trans.sel.margin            [4 0 4 0 1]
+    set trans.bpm.tap.margin        [0 1 0 0 0.5]
+    set trans.bpm.edit.margin       [0 0 0 3 0.5]
+    
+    ; >>> Hide rules
+    ; == distance between main (play/pause) and secondary (bpm/timesig) button groups; if <0 they overlap
+    set btn_group_distance  h<row_height_x2{0}  - trans.bpm.tap{x}  + trans.pause{x} trans.pause{w}  0
+
+    set trans.rew           btn_group_distance{0}<0   [0]
+    set trans.fwd           btn_group_distance{0}<0   [0]
+    set trans.rec           btn_group_distance{0}<0   [0]
+    set trans.play          btn_group_distance{0}<0   [0]
+    set trans.repeat        btn_group_distance{0}<0   [0]
+    set trans.stop          btn_group_distance{0}<0   [0]
+    set trans.pause         btn_group_distance{0}<0   [0]
+
+    set trans.bpm.tap       btn_group_distance{0}<0     [6 trans.bpm.tap trans.bpm.tap trans.bpm.tap]
+    set trans.bpm.edit      btn_group_distance{0}<0     [6 trans.bpm.edit trans.bpm.edit trans.bpm.edit]
+    set trans.curtimesig    btn_group_distance{0}<0   + [6 trans.curtimesig trans.curtimesig trans.curtimesig]   + [trans.bpm.edit]    [trans.bpm.edit{w}]
+    set trans.automode      btn_group_distance{0}<0   + [6 trans.automode trans.automode trans.automode]         + [trans.curtimesig]  [trans.curtimesig{w}]
+    set trans.rate.fader    btn_group_distance{0}<0   + [6 trans.rate.fader trans.rate.fader trans.rate.fader]   + [trans.automode]    [trans.automode{w}]
+    set trans.rate          btn_group_distance{0}<0   + [6 trans.rate trans.rate trans.rate]                     + [trans.rate.fader]  [trans.rate.fader{w}]
+
+    ; == calc distance between secondary buttons and status (when the status is in the right corner)
+    set bpm_group_end           + trans.rate{x} trans.rate{w}
+    set status_btns_distance    sec_status_width{0}<status_min{0}   - trans.status{x} bpm_group_end   0
+    set trans.status            status_btns_distance{0}<0    + - [0 0 w] [0 0 bpm_group_end]  + [bpm_group_end] [0 trans.status -10 trans.status]
+
+    ; == hide status on small width
+    set trans.status        btn_group_distance{0}<0  trans.status{w}<status_min{0}  [0]
 endMacro
 
-
-drawTransport 1.0
-
-
-set trans.bpm.tap.color    [190 190 190]
-set trans.bpm.edit.color   [230 230 230]
-
-set trans.rate.color       text_color
-
-; Ubuntu-Bold-12
-set trans.sel.font         [4]
-set trans.bpm.tap.font     [4]
-set trans.bpm.edit.font    [4]
-set trans.curtimesig.font  [4]
-; Tahoma-Bold-10
-set trans.rate.font        [3]
-
-set trans.bpm.tap.margin   [0 1 0 0 0.5]
-set trans.bpm.edit.margin  [0 0 0 3 0.5]
-
-
-; == distance between main (play/pause) and secondary (bpm/timesig) button groups; if <0 they overlap
-set btns_distance   h<row_height_x2{0}  - trans.bpm.tap{x}  + trans.pause{x} trans.pause{w}  0
-
-set trans.rew      btns_distance{0}<0   [0]
-set trans.fwd      btns_distance{0}<0   [0]
-set trans.rec      btns_distance{0}<0   [0]
-set trans.play     btns_distance{0}<0   [0]
-set trans.repeat   btns_distance{0}<0   [0]
-set trans.stop     btns_distance{0}<0   [0]
-set trans.pause    btns_distance{0}<0   [0]
-
-set trans.bpm.tap       btns_distance{0}<0      [6 trans.bpm.tap trans.bpm.tap trans.bpm.tap]
-set trans.bpm.edit      btns_distance{0}<0      [6 trans.bpm.edit trans.bpm.edit trans.bpm.edit]
-set trans.curtimesig    btns_distance{0}<0    + [6 trans.curtimesig trans.curtimesig trans.curtimesig]   + [trans.bpm.edit]    [trans.bpm.edit{w}]
-set trans.automode      btns_distance{0}<0    + [6 trans.automode trans.automode trans.automode]         + [trans.curtimesig]  [trans.curtimesig{w}]
-set trans.rate.fader    btns_distance{0}<0    + [6 trans.rate.fader trans.rate.fader trans.rate.fader]   + [trans.automode]    [trans.automode{w}]
-set trans.rate          btns_distance{0}<0    + [6 trans.rate trans.rate trans.rate]                     + [trans.rate.fader]  [trans.rate.fader{w}]
-
-; == calc distance between secondary buttons and status (when the status is in the right corner)
-set sec_btns_end            + trans.rate{x} trans.rate{w}
-set status_btns_distance    sec_status_width{0}<status_min{0}   - trans.status{x} sec_btns_end   0
-set trans.status            status_btns_distance{0}<0    + - [0 0 w] [0 0 sec_btns_end]  + [sec_btns_end] [0 trans.status -10 trans.status]
-
-; == hide status on small width
-set trans.status   btns_distance{0}<0  trans.status{w}<status_min{0}  [0]
+drawTransport
