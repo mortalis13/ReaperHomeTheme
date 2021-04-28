@@ -19,7 +19,7 @@ gen_vol_zeroline FF000000
 gen_pan_zeroline FF000000
 item_volknobfg 85000000 FF778485 00474F4F
 mcp_min_height 240
-tcp_master_minheight 56
+tcp_master_minheight 60
 mcp_voltext_flags 5 5
 tcp_voltext_flags 12
 tinttcp 298
@@ -407,7 +407,7 @@ endMacro
 
 
 macro drawMasterTcp scale
-    set master.tcp.size                         * scale [300 100 40 56]
+    set master.tcp.size                         * scale [300 100 40 60]
     set main_sec                                !meter_flip{0} + [0 0 0 this_y_end{0}] * scale [0 0 0 8]  ; recalculate sections now we know this_y_end
     set vol_sec                                 !meter_flip{0} + [0 main_sec{3} w tcp_padding{1}] * scale [0 0 0 22] .
     set meter_sec                               ?mainCollapse{0} [0 0 w h] !meter_flip{0} tcp_fxparms>0 \
@@ -472,9 +472,9 @@ drawMasterTcp
 ; >>>> [VARS]
 set master_tcp_pad  6
 set mrow1_y  6
-set mrow2_y  30
-set mrow3_y  70
-set mrow4_y  106
+set mrow2_y  28
+set mrow3_y  68
+set mrow4_y  104
 
 set meter_sec  + - [w] [35] [0 0 31 h]
 set meter_sec  w<153  - [23 0 w h] [0 0 23]
@@ -519,7 +519,7 @@ set master.tcp.volume.label      [8 mrow4_y 80 20]
 set master.tcp.pan.label         + - [w]  [master.tcp.meter{w}]  [-100 mrow4_y 80 20]
 
 
-; >>>> Hide
+; >>>> Hide rules
 set master.tcp.io             w<297  [0]
 set master.tcp.env            w<241  [0]
 set master.tcp.pan            w<241  [0]
@@ -538,18 +538,11 @@ set master.tcp.label          w<153  [4 0 8 h]
 set master.tcp.label.margin   w<153  [0 0 0 0 0.5]
 
 
-set master.tcp.volume.label   h<129  [0]
-set master.tcp.pan.label      h<129  [0]
+set master.tcp.volume.label   h<123  [0]
+set master.tcp.pan.label      h<123  [0]
 
-set master.tcp.volume         h<106  [0]
-set master.tcp.pan            h<106  [0]
-
-set master.tcp.mute           h<66   [0]
-set master.tcp.solo           h<66   [0]
-set master.tcp.fx             h<66   [0]
-set master.tcp.fxbyp          h<66   [0]
-set master.tcp.env            h<66   [0]
-set master.tcp.io             h<66   [0]
+set master.tcp.volume         h<100  [0]
+set master.tcp.pan            h<100  [0]
 
 
 
