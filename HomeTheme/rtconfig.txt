@@ -1,3 +1,4 @@
+; Based on Default_6.0
 #>----------------------------------- GLOBALS -----------------------------------------
 version 6.0
 use_pngs 1
@@ -33,48 +34,13 @@ misc_dpi_translate 174 200
 
 ; ----------------- WALTER -------------------
 
-; font #1/6/11 - calibri 8
-; font #2/7/12 - calibri 9
-; font #3/8/13 - calibri 10
-; font #4/9/14 - calibri 11
-
-; ---------------------------------------------------------------
-
 ; Global stuff : here are some often-used lines, set as definitions
 
-set width_visible trackpanmode<4 [0] trackpanmode==6 [2] [1]  ; can be ==3 instead of <4 if width desired for 3.x
+set width_visible              trackpanmode<4 [0] trackpanmode==6 [2] [1]  ; can be ==3 instead of <4 if width desired for 3.x
 set gl_pan_color               width_visible{0}!=2 [0 0 0 120] [84 63 63]
 set gl_width_color             width_visible{0}==1 [255 255 255 210] [63 84 63]
 set gl_fader_swap              width_visible{0}==2 [0] [1]
-text_over_custom val_color
 
-
-; ------ GLOBAL SETTINGS FOR TEXT COLORS ------
-
-set custom_col              [trackcolor_r trackcolor_g trackcolor_b]
-set luma                    + + * 0.299 [trackcolor_r] * 0.587 [trackcolor_g] * 0.114 [trackcolor_b]
-
-; macro for the color of text that is drawn over custom colors 
-set swapLuma    130         ; (0 to 255) custom color brightness to switch from 'light' to 'dark' text
-set pushLuma    90          ; (0 to 255) very dim custom color brighness
-macro text_over_custom element
-    set element             ?trackcolor_valid \
-                                ?track_selected \
-                                    + custom_col luma{0}<swapLuma{0} \
-                                        luma{0}<pushLuma [220 220 220] [-100 -100 -100] \
-                                        [-120 -120 -120] \
-                                    + custom_col luma{0}<swapLuma{0} \
-                                        luma{0}<pushLuma [180 180 180] [100 100 100] \
-                                        [-120 -120 -120] \
-                                ?track_selected [66 67 67] [54 57 57]
-endmacro
-
-set TrackLabelCColor            param80
-
-; macro for the color of track labels, with tweaked custom color inheritance if a custom color is too dark
-macro trackLabelColor element
-    set element                 ?recarm [255 100 0] ?track_selected [255 255 255] ?trackcolor_valid  ?TrackLabelCColor{0} luma{0}<120 + custom_col [80 80 80] custom_col [168 172 172] [168 172 172]
-endmacro
 
 #<
 #>---------------------------- TRACK CONTROL PANELS -----------------------------------
@@ -139,49 +105,6 @@ macro calcTcpSecs scale
     set previous_element                        tcpNullElement      ; Let's start at the very beginning. A very good place to start.
 endMacro
 
-macro doHideLogic element paramIdx
-    set hide_##element param##paramIdx##&1 ?mixer_visible 1 0
-    set hide_##element param##paramIdx##&2 !track_selected 1 hide_##element
-    set hide_##element param##paramIdx##&4 !recarm 1 hide_##element
-    set hide_##element param##paramIdx##&8 1 hide_##element
-endmacro
-
-macro then element width use_padding
-    ; apply scale
-    set s_width             * width scale
-
-    set prev_end            + [previous_element] [previous_element{2}]                                  ; find the end of the previous element
-    set element             [prev_end previous_element s_width element_h]                               ; ...and place the element there
-    set element             ?hide_##element{0} [. . 0 element_h]                                        ; apply hide params
-
-    ; x-axis
-    set element             ?use_padding !hide_##element{0} + [tcp_padding]                             ; if x-padding is required, add it
-    set this_end            - + + [element] [element{2}] [tcp_padding] [main_sec]                       ; okay, and what does that make the x-end of this element, realtive to main_sec?
-    set element             ?mainCollapse{0} [. . 0 0]
-
-    ; y-axis
-    set next_row            + [0 element] [0 previous_element{3}]                                       ; find the y of the next row
-    set element             this_end{0}>main_eff{0} + [main_sec next_row element element] tcp_padding   ; move it to the next row
-    set this_end            - + + [element] [element{2}] [tcp_padding] [main_sec]                       ; recalculate this_end, now that the element is on a new row
-    set element             this_end{0}>main_eff{0} [. . 0 0]                                           ; ... and cull if there's still not enough main_sec width to fit
-    set this_y_end          + + element{1} element{3} tcp_padding{1}                                    ; find its bottom
-    set element             this_y_end{0}>main_sec{3} [0] !previous_element{2} !previous_element{3} [0] . .                 ; cull if there's not enough height to fit, or if previous_element was culled
-
-    ; values readout control
-    set valuesRoom          - - main_sec{3} this_y_end{0} tcp_padding{1}                                ; is the remaining height after this element enough for the values to fit?
-    set hideValues          valuesRoom{0}<8 element{3}!=0 [1] . .                                       ; if not, and this element isn't already hidden, cull the values
-
-    set previous_element element
-    set main_sec_last       element{3}>0 this_y_end{0} .
-    
-endmacro
-
-; ---- MODDING WITH 'THEN' ----
-Elements within the main section of the TCP flow one after another based on the previous element's position and size,
-and will move to the next row if necessary, and hide if there's not enough room. The order they appear is determined in
-the 'then' sections. Because of the way WALTER's syntax works, it is not possible to do this with a script. However,
-its very easy for you to mod ...just change the line order in the 'then' section.
-; -----------------------------
 
 macro drawTcp scale
     set OSoffs                                  os_type==1 [0 2 0 -2]
@@ -194,7 +117,6 @@ macro drawTcp scale
       set tcp_idx_margin                        - / h 2 * scale 18
       set tcp.trackidx.margin                   + [this_tcp_indent] + [0 tcp_idx_margin 0 tcp_idx_margin 0.5] folderstate<0 * scale [0 -6 0 6] folderstate==1 * scale [0 16] 0
       set tcp.trackidx.font                     scale{0}==1 [2] scale{0}==1.5 [7] [12]
-      text_over_custom                          tcp.trackidx.color
       set tcp.trackidx.color                    ?track_selected [50 50 50] .
     set tcp.mute                                   + + [meter_sec] [meter_sec{2}] h>=soloFlip_h{0} * scale [-25 3 21 20] + [0 tcp_padding] * scale [-43 0 21 20]
     set tcp.solo                                h>=soloFlip_h{0} + + [0 2] tcp.mute [0 tcp.mute{3}] \
@@ -211,7 +133,6 @@ macro drawTcp scale
     set tcp.label                               ?labelFlip{0} + [main_sec 0 1 -2] [main_eff{0} 0 element_h{0} h]
         set tcp.label.margin                    ?labelFlip{0} [4 1 2 1 0.5] * scale + OSoffs [4 1 2 2 0]
         set tcp.label.font                      scale{0}==1 [3] scale{0}==1.5 [8] [13]
-        trackLabelColor                         tcp.label.color
     set tcp.fx                                  !fx_group{2} [0] + [fx_group fx_group] + * scale [0 0 20] [0 0 0 element_h{0}]
     set tcp.fxbyp                               !fx_group{2} [0] + + [tcp.fx tcp.fx] [tcp.fx{2}] + * scale [0 0 16] [0 0 0 element_h{0}]
     set tcp.fxin                                !input_group{2} [0] + [input_group input_group] + * scale [0 0 29] [0 0 0 element_h{0}]
@@ -266,87 +187,86 @@ macro drawTcp scale
     set tcp.fxparm.font                         scale{0}==1 [1 24 100 100 -1 0 1 4] scale{0}==1.5 [6 36 150 150 -4 0 2 6] [11 48 200 200 -6 0 2 8]
     set tcp.fxparm.font                         + . os_type==1 * scale [0 0 0 0 3] [0]
     set tcp.fxparm.margin                       * [scale scale scale scale 1 scale 1 scale]  [3 0 3 0 0 14 0.5 6]
-
 endMacro
 
 
 ;-------------
+front                     tcp.recarm tcp.label tcp.volume tcp.solo tcp.mute tcp.phase tcp.width tcp.foldercomp tcp.folder
 
-front                             tcp.recarm tcp.label tcp.volume tcp.solo tcp.mute tcp.phase tcp.width tcp.foldercomp tcp.folder
 set tcp_indent            20
 set tcp_control_align     0
 set tcpLabelAutoMeasured  100
 
-set tcp_MeterLoc    1
-set tcp_LabelPair   110
-set tcp_sepSends    0
-set tcp_MeterSize   10
+set tcp_MeterLoc          1
+set tcp_LabelPair         110
+set tcp_sepSends          0
+set tcp_MeterSize         10
 
 set scale 1
 
 ;-------------
 calcTcpSecs
 
-set tcp_size   [360 160]
-set tcp.size   [tcp_size tcp_size]
-set tcp_w      tcp_size{0}
+set tcp_size              [360 160]
+set tcp.size              [tcp_size tcp_size]
+set tcp_w                 tcp_size{0}
 
-set meter_sec  + - meter_sec [0 0 12 0] [8]
-set meter_sec  ?mainCollapse{0}  - [main_sec 0 w h] [0 0 main_sec{0}]
+set meter_sec             + - meter_sec [0 0 12 0] [8]
+set meter_sec             ?mainCollapse{0}  - [main_sec 0 w h] [0 0 main_sec{0}]
 
 ;-------------
 drawTcp
 
 
 ; >>>> [VARS]
-set track_idx_off  [main_sec]
-set tcp_pad_left   h<44  4 6
-set tcp_pad_left   w<243 4
-set tcp_pad_right  h<44  8 12
+set track_idx_off      [main_sec]
+set tcp_pad_left       h<44  4 6
+set tcp_pad_left       w<243 4
+set tcp_pad_right      h<44  8 12
 
-set row1_y    6
-set row2_y    40
-set row3_y    76
-set row4_y    102
-set row5_y    134
-set row6_y    160
+set row1_y             6
+set row2_y             40
+set row3_y             76
+set row4_y             102
+set row5_y             134
+set row6_y             160
 
-set row4_y    h<138 row3_y
+set row4_y             h<138  row3_y
 
-set btn_h        20
-set btn_h2       30
-set label_h      30
+set btn_h              20
+set btn_h2             30
+set label_h            30
 
-set readout_w    80
-set mute_solo_w  32
-set fx_w         30
-set env_w        61
-set io_w         51
-set pan_w        30
-set recmon_w     30
+set readout_w          80
+set mute_solo_w        32
+set fx_w               30
+set env_w              61
+set io_w               51
+set pan_w              30
+set recmon_w           30
 
 
 ; >>>> Override >>>>
-set tcp.meter        meter_sec
-set tcp.folder     + tcp.folder [0 60]
-set tcp.trackidx   + tcp.trackidx [0 0 0 60]
+set tcp.meter                           meter_sec
+set tcp.folder                          + tcp.folder [0 60]
+set tcp.trackidx                        + tcp.trackidx [0 0 0 60]
 
-set tcp.label.margin   * scale + OSoffs + [4 1 2 2 0]  h<44 [4] [0]
+set tcp.label.margin                    * scale + OSoffs + [4 1 2 2 0]  h<44 [4] [0]
 
-set tcp.volume.fadermode   [0]
+set tcp.volume.fadermode                [0]
 
 ; >>>> Fonts / Colors
-set tcp.trackidx.font  [3]
-set tcp.label.color    [255 255 255]
+set tcp.trackidx.font                   [3]
+set tcp.label.color                     [255 255 255]
 
-set tcp.volume.color        [0 0 0 255 220 20 20 255]
+set tcp.volume.color                    [0 0 0 255 220 20 20 255]
 ; Tahoma-Bold-11
-set tcp.volume.label.font   [2]
-set tcp.volume.label.color  [0 0 0]
+set tcp.volume.label.font               [2]
+set tcp.volume.label.color              [0 0 0]
 
-set tcp.pan.color           [0 0 0 255 220 20 20 255]
-set tcp.pan.label.color     [0 0 0]
-set tcp.pan.label.font      [2]
+set tcp.pan.color                       [0 0 0 255 220 20 20 255]
+set tcp.pan.label.color                 [0 0 0]
+set tcp.pan.label.font                  [2]
 
 set tcp.meter.readout.color             [255 255 255]
 
@@ -358,42 +278,38 @@ set tcp.meter.scale.color.unlit.top     [255 255 255 255]
 
 
 ; >>>> ROW_1
-set tcp.recarm   + [track_idx_off]  [tcp_pad_left row1_y 30 btn_h2]
+set tcp.recarm             + [track_idx_off]  [tcp_pad_left row1_y 30 btn_h2]
 
-set label_off    h<44   + [track_idx_off] [tcp_pad_left]  + tcp.recarm{x} tcp.recarm{w}
-set label_w      - - - - tcp_w  tcp.meter{w}  label_off{0}  * 2 tcp_pad_left  recmon_w
-set label_w      h<44   - + - label_w  * 2 mute_solo_w  recmon_w  4
-set label_w      w<243  + label_w  recmon_w
+set label_off              h<44   + [track_idx_off] [tcp_pad_left]  + tcp.recarm{x} tcp.recarm{w}
+set label_w                - - - - tcp_w  tcp.meter{w}  label_off{0}  * 2 tcp_pad_left  recmon_w
+set label_w                h<44   - + - label_w  * 2 mute_solo_w  recmon_w  4
+set label_w                w<243  + label_w  recmon_w
 
-set tcp.label    + + [label_off]  [0 0 label_w{0}]  [0 row1_y -4 label_h 0 0 1 0]
-set tcp.recmon   + - - - [tcp_w]  [tcp.meter{w}]    [tcp_pad_right]  [recmon_w]  [0 row1_y recmon_w btn_h2 1 0 1 0]
-
+set tcp.label              + + [label_off]  [0 0 label_w{0}]  [0 row1_y -4 label_h 0 0 1 0]
+set tcp.recmon             + - - - [tcp_w]  [tcp.meter{w}]    [tcp_pad_right]  [recmon_w]  [0 row1_y recmon_w btn_h2 1 0 1 0]
 
 ; >>>> ROW_2
-set tcp.mute     +   [track_idx_off] [tcp_pad_left row2_y mute_solo_w btn_h2]
-set tcp.solo     + + [tcp.mute{x}]   [tcp.mute{w}] [0 row2_y mute_solo_w btn_h2]
+set tcp.mute               +   [track_idx_off] [tcp_pad_left row2_y mute_solo_w btn_h2]
+set tcp.solo               + + [tcp.mute{x}]   [tcp.mute{w}] [0 row2_y mute_solo_w btn_h2]
 
-set tcp.fx       + + [tcp.solo{x}]   [tcp.solo{w}]  [tcp_pad_left row2_y fx_w btn_h2]
-set tcp.fxbyp    + + [tcp.fx{x}]     [tcp.fx{w}]    [0 row2_y 24 btn_h2]
+set tcp.fx                 + + [tcp.solo{x}]   [tcp.solo{w}]  [tcp_pad_left row2_y fx_w btn_h2]
+set tcp.fxbyp              + + [tcp.fx{x}]     [tcp.fx{w}]    [0 row2_y 24 btn_h2]
 
-set tcp.env      + + [tcp.fxbyp{x}]  [tcp.fxbyp{w}]  [tcp_pad_left row2_y env_w btn_h2]
-set tcp.io       + + [tcp.env{x}]    [tcp.env{w}]    [tcp_pad_left row2_y io_w btn_h2]
-
+set tcp.env                + + [tcp.fxbyp{x}]  [tcp.fxbyp{w}]  [tcp_pad_left row2_y env_w btn_h2]
+set tcp.io                 + + [tcp.env{x}]    [tcp.env{w}]    [tcp_pad_left row2_y io_w btn_h2]
 
 ; >>>> ROW_3
-set tcp.recmode  +   [track_idx_off]   [tcp_pad_left row3_y 39 btn_h]
-set tcp.fxin     + + [tcp.recmode{x}]  [tcp.recmode{w}]   [tcp_pad_left row3_y 29 btn_h]
-set tcp.recinput + + [tcp.fxin{x}]     [tcp.fxin{w}]      [0 row3_y 100 btn_h]
-set tcp.phase    + + [tcp.recinput{x}] [tcp.recinput{w}]  [tcp_pad_left row3_y 16 btn_h]
-
+set tcp.recmode            +   [track_idx_off]   [tcp_pad_left row3_y 39 btn_h]
+set tcp.fxin               + + [tcp.recmode{x}]  [tcp.recmode{w}]   [tcp_pad_left row3_y 29 btn_h]
+set tcp.recinput           + + [tcp.fxin{x}]     [tcp.fxin{w}]      [0 row3_y 100 btn_h]
+set tcp.phase              + + [tcp.recinput{x}] [tcp.recinput{w}]  [tcp_pad_left row3_y 16 btn_h]
 
 ; >>>> ROW_4
-set volume_w     - - - - tcp_w track_idx_off tcp.meter{w} * 2 tcp_pad_left pan_w
-set volume_w     w<243  + + volume_w  pan_w  * 0.5 tcp_pad_left
-set tcp.volume   + [track_idx_off 0 volume_w{0}]  [tcp_pad_left row4_y -10 btn_h2 0 0 1 0]
+set volume_w               - - - - tcp_w track_idx_off tcp.meter{w} * 2 tcp_pad_left pan_w
+set volume_w               w<243  + + volume_w  pan_w  * 0.5 tcp_pad_left
+set tcp.volume             + [track_idx_off 0 volume_w{0}]  [tcp_pad_left row4_y -10 btn_h2 0 0 1 0]
 
-set tcp.pan      + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [pan_w]  [0 row4_y pan_w btn_h2 1 0 1 0]
-
+set tcp.pan                + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [pan_w]  [0 row4_y pan_w btn_h2 1 0 1 0]
 
 ; >>>> ROW_5
 set tcp.volume.label       + [track_idx_off]  [6 row5_y readout_w 20]
@@ -401,61 +317,60 @@ set tcp.pan.label          + - - [tcp_w] [tcp.meter{w}]  - [readout_w] [20]  [0 
 set tcp.pan.label.margin   [0]
 
 
-; >>>> Hide
-set tcp.io            w<320  [0]
+; >>>> Hide rules
+set tcp.io                 w<320  [0]
 
-set tcp.env           w<263  [0]
-set tcp.phase         w<263  [0]
+set tcp.env                w<263  [0]
+set tcp.phase              w<263  [0]
 
-set tcp.recmon        w<243  [0]
-set tcp.recinput      w<243  [0]
-set tcp.fxin          w<243  [0]
-set tcp.pan           w<243  [0]
+set tcp.recmon             w<243  [0]
+set tcp.recinput           w<243  [0]
+set tcp.fxin               w<243  [0]
+set tcp.pan                w<243  [0]
 
-set tcp.fx            w<193  [0]
-set tcp.fxbyp         w<193  [0]
-set tcp.pan.label     w<193  [0]
+set tcp.fx                 w<193  [0]
+set tcp.fxbyp              w<193  [0]
+set tcp.pan.label          w<193  [0]
 
-set tcp.recarm        ?mainCollapse{0}  [0]
-set tcp.label         ?mainCollapse{0}  [0]
-set tcp.mute          ?mainCollapse{0}  [0]
-set tcp.solo          ?mainCollapse{0}  [0]
-set tcp.recmode       ?mainCollapse{0}  [0]
-set tcp.volume        ?mainCollapse{0}  [0]
-set tcp.volume.label  ?mainCollapse{0}  [0]
+set tcp.recarm             ?mainCollapse{0}  [0]
+set tcp.label              ?mainCollapse{0}  [0]
+set tcp.mute               ?mainCollapse{0}  [0]
+set tcp.solo               ?mainCollapse{0}  [0]
+set tcp.recmode            ?mainCollapse{0}  [0]
+set tcp.volume             ?mainCollapse{0}  [0]
+set tcp.volume.label       ?mainCollapse{0}  [0]
 
 
-set tcp.volume.label  h<155  [0]
-set tcp.pan.label     h<155  [0]
+set tcp.volume.label       h<155  [0]
+set tcp.pan.label          h<155  [0]
 
-set tcp.recmode       h<138  [0]
-set tcp.fxin          h<138  [0]
-set tcp.recinput      h<138  [0]
-set tcp.phase         h<138  [0]
+set tcp.recmode            h<138  [0]
+set tcp.fxin               h<138  [0]
+set tcp.recinput           h<138  [0]
+set tcp.phase              h<138  [0]
 
-set tcp.volume        h<112  [0]
-set tcp.pan           h<112  [0]
+set tcp.volume             h<112  [0]
+set tcp.pan                h<112  [0]
 
-set tcp.mute          h<75   [0]
-set tcp.solo          h<75   [0]
-set tcp.fx            h<75   [0]
-set tcp.fxbyp         h<75   [0]
-set tcp.env           h<75   [0]
-set tcp.io            h<75   [0]
+set tcp.mute               h<75   [0]
+set tcp.solo               h<75   [0]
+set tcp.fx                 h<75   [0]
+set tcp.fxbyp              h<75   [0]
+set tcp.env                h<75   [0]
+set tcp.io                 h<75   [0]
 
-set tcp.recarm        h<44   [0]
-set tcp.recmon        h<44   [0]
+set tcp.recarm             h<44   [0]
+set tcp.recmon             h<44   [0]
 
-set tcp.label         h<44  w<243  [0]
+set tcp.label              h<44  w<243  [0]
 
 ; **** stick to the right edge
-set tcp.solo          h<44   + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [mute_solo_w]  [-4 row1_y mute_solo_w btn_h2 1 0 1 0]
-set tcp.mute          h<44   - [tcp.solo{x} row1_y mute_solo_w btn_h2 1 0 1 0]  [mute_solo_w]
+set tcp.solo               h<44   + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [mute_solo_w]  [-4 row1_y mute_solo_w btn_h2 1 0 1 0]
+set tcp.mute               h<44   - [tcp.solo{x} row1_y mute_solo_w btn_h2 1 0 1 0]  [mute_solo_w]
 
 ; **** restore the left edge anchor
-set tcp.mute          h<44 w<243 ?mainCollapse{0}  [0]  + + [track_idx_off]  [tcp_pad_left]  [0 row1_y mute_solo_w btn_h2]
-set tcp.solo          h<44 w<243 ?mainCollapse{0}  [0]  + + [tcp.mute{x}]    [tcp.mute{w}]   [0 row1_y mute_solo_w btn_h2]
-
+set tcp.mute               h<44 w<243 ?mainCollapse{0}  [0]  + + [track_idx_off]  [tcp_pad_left]  [0 row1_y mute_solo_w btn_h2]
+set tcp.solo               h<44 w<243 ?mainCollapse{0}  [0]  + + [tcp.mute{x}]    [tcp.mute{w}]   [0 row1_y mute_solo_w btn_h2]
 
 
 
@@ -872,10 +787,8 @@ macro drawMcp scale
                                                     ?mcp_control_align{0} * - mcp_maxfolderdepth folderdepth [0 0 0 mcp_indent_s{0}] [0]
       set mcp.label.margin                      * [scale scale scale scale 1] [4 0 4 3 0.5]
       set mcp.label.font                        scale==1 [3] scale==1.5 [8] [13]
-      trackLabelColor                           mcp.label.color
     set mcp.trackidx                            + + [0 bot_sec] [0 mcp.label{3}] - [0 0 mcp.size{0} bot_sec_height{0}] [0 0 0 mcp.label{3}]
       set mcp.trackidx.margin                   + - [0 0 0 mcp.trackidx{3} 0.5] * scale [0 0 0 20] folderstate==1 * scale [12] [0]
-      text_over_custom                          mcp.trackidx.color
       set mcp.trackidx.color                    ?track_selected [50 50 50] .
       set mcp.trackidx.font                     scale==1 [3] scale==1.5 [8] [13]
     set mcp.folder                              + + [0 bot_sec] [0 mcp.label{3}] folderstate<0 + + [mcp.size] [sidebar_sec{2}] * scale [-21 -2 21 22] * scale [0 -2 18 22]
