@@ -442,6 +442,7 @@ set tcp.trackidx.font  [3]
 set tcp.label.color    [255 255 255]
 
 set tcp.volume.color        [0 0 0 255 220 20 20 255]
+; Tahoma-Bold-11
 set tcp.volume.label.font   [2]
 set tcp.volume.label.color  [0 0 0]
 
@@ -1137,7 +1138,7 @@ macro drawTransport scale
     set trans_rateSize              170
     set trans_rateSize              * scale trans_rateSize{0}
     set trans_rateSize_padded       + trans_rateSize{0} * scale 3
-    set size_rate                   + * scale [3 0 0 44] [0 0 trans_rateSize{0} 0 trans_rateSize_padded{0}]
+    set size_rate                   + * scale [3 1 0 44] [0 0 trans_rateSize{0} 0 trans_rateSize_padded{0}]
 
     ; Set absolute sizes...
     ;     element   px  py  w   h
@@ -1152,8 +1153,8 @@ macro drawTransport scale
     size  automode  2   0   54  44
     
     size  status    6   2   450 44
-    size  bpm       0   0   54  44
-    size  timesig   2   0   50  44
+    size  bpm       0   1   54  44
+    size  timesig   2   1   50  44
     size  selection 0   10  350 24
 
     set row_height                  * scale [48]
@@ -1175,6 +1176,10 @@ macro drawTransport scale
     set all_width                   + + + + sec_buttons_width  size_status{4}  sec_proj_width  size_selection{4}  [380]
     set buttons_proj_width          + sec_buttons_width sec_proj_width
     set buttons_proj_cutoff         - buttons_proj_width{0} w
+    
+    set w_btn_stat_sel              + + + sec_buttons_width  size_status{4}  size_selection{4}  [30]
+    set w_btn_stat                  + + sec_buttons_width  size_status{4}  [30]
+    set w_bpm_sel                   + + sec_proj_width  size_selection{4}  [20]
 
     set w_stretch                   - all_width w
     set sec_status_width            - h<row_height_x2{0} w<all_width{0}  - size_status{4} * w_stretch 0.6 size_status{4}  size_status{4}  size_status{0}
@@ -1187,32 +1192,45 @@ macro drawTransport scale
     set sec_status                  [sec_buttons{2} 0 sec_status_width{0} size_status]
     set sec_status                  sec_sel{2}<selection_min{0} + sec_status [0 0 sec_sel] ; proj section is going to be hidden, so steal its width
     ;set sec_status                  sec_status_width{0}<status_min{0} [0] .
-    set sec_status                  + sec_status  w<all_width{0}  [10] [20]
+    set sec_status                  + sec_status  w<all_width{0} h<row_height_x2{0}  [10] [20] [20]
     
-    set sec_proj                    - [w 0 sec_proj{2} sec_proj] [sec_proj{2}]
+    ;set sec_proj                    [0 0 sec_proj{2} sec_proj]
+    ;set sec_proj                    - [w 0 sec_proj{2} sec_proj] [sec_proj{2}]
     ;set sec_proj                    h<row_height_x2{0} w<buttons_proj_width{0} [0] . . ; single row, hide proj section if it still doesn't fit
     
     set sec_sel                     sec_sel{2}<selection_min{0} [0] - [w size_selection sec_sel size_selection] [sec_sel{2}]
 
-        ; jumping rows when panel is narrow
-        ; ...2 rows
-        set sec_sel                 w<all_width{0} h<row_height_x2{0} . + [0 row_height{0}] [0 sec_sel sec_sel sec_sel] .
-        set sec_proj                w<all_width{0} h<row_height_x2{0} . + [sec_sel row_height{0}] [sec_sel{2} 0 sec_proj sec_proj] .
-        ; ...4 rows
-        set row_1_width             + sec_buttons_width sec_status_width
-        set row_2_width             + sec_proj_width sec_sel_width
-        set 2rows_max               row_1_width{0}>row_2_width{0} row_1_width{0} row_2_width{0}
-        set sec_status_width        w<sec_status_width{0} - w size_status{0}
-        set sec_status              w<2rows_max{0} [0 row_height{0} sec_status_width{0} size_status] .
-        set sec_sel                 w<sec_sel{2} [sec_sel sec_sel w sec_sel]
-        set sec_sel                 w<2rows_max{0} + [0 row_height_x2{0}] [size_selection size_selection sec_sel size_selection] .
-        set sec_proj                w<sec_proj{2} [sec_proj sec_proj w sec_proj]
-        ;set sec_proj                w<2rows_max{0} [0 row_height_x3{0} sec_proj sec_proj] .
+        ;; jumping rows when panel is narrow
+        ;; ...2 rows
+        ;set sec_sel                 w<all_width{0} h<row_height_x2{0}  .  + [0 row_height{0}] [0 sec_sel sec_sel sec_sel]             .
+        ;set sec_proj                w<all_width{0} h<row_height_x2{0}  .  + [sec_sel row_height{0}] [sec_sel{2} 0 sec_proj sec_proj]  .
+        ;; ...4 rows
+        ;set row_1_width             + sec_buttons_width sec_status_width
+        ;set row_2_width             + sec_proj_width sec_sel_width
+        ;set 2rows_max               row_1_width{0}>row_2_width{0} row_1_width{0} row_2_width{0}
+        ;set sec_status_width        w<sec_status_width{0} - w size_status{0}
+        ;set sec_status              w<2rows_max{0} [0 row_height{0} sec_status_width{0} size_status] .
+        ;set sec_sel                 w<sec_sel{2} [sec_sel sec_sel w sec_sel]
+        ;set sec_sel                 w<2rows_max{0} + [0 row_height_x2{0}] [size_selection size_selection sec_sel size_selection] .
+        ;set sec_proj                w<sec_proj{2} [sec_proj sec_proj w sec_proj]
+        ;;set sec_proj                w<2rows_max{0} [0 row_height_x3{0} sec_proj sec_proj] .
 
-        set trans_min_width         h>row_height{0} sec_status_width{0}<sec_proj_width{0} sec_proj_width{0} sec_status_width{0} + * scale [216] [0 row_height{0}]
-        set trans.size.dockedheight row_height{0}
-        set trans.size.minmax       [trans_min_width row_height{0} 10000 row_height_x4{0}]
-
+        ;set trans_min_width         h>row_height{0} sec_status_width{0}<sec_proj_width{0}  sec_proj_width{0}  sec_status_width{0}  + * scale [216] [0 row_height{0}]
+        set trans_min_width          sec_proj_width{0}
+        set trans.size.dockedheight  row_height{0}
+        set trans.size.minmax        [trans_min_width row_height{0} 10000 row_height_x2{0}]
+    
+    
+    ; == multi-rows
+    set centered_bpm   w<all_width{0}  h>=row_height_x2{0}  0  1  1
+    set sec_proj       !centered_bpm{0}  + [0 row_height{0}] [6 sec_proj sec_proj sec_proj]
+    ;set sec_sel        w<w_btn_stat_sel{0}  h>=row_height_x2{0}  + [sec_proj{w} row_height{0}]  [sec_proj{x} sec_sel sec_sel sec_sel]
+    set sec_sel        w<w_btn_stat_sel{0}  h>=row_height_x2{0}   +  - + [trans.status{x}] [trans.status{w}] [sec_sel{w}]   + [0 row_height{0}]  [0 sec_sel sec_sel sec_sel]
+    set sec_sel        w<w_bpm_sel{0}  h>=row_height_x2{0}  [0]
+    set sec_status     w<w_btn_stat{0} h>=row_height_x2{0}  - [sec_status sec_status sec_status sec_status]  + - [0 0 w_btn_stat] [0 0 w] [0 0 30]
+    set sec_status     w<w_btn_stat{0} h>=row_height_x2{0}  sec_status{w}<status_min{0}  [0]
+    
+    
     ; transport center
     set transCenter             !sec_sel{2} 0 w<all_width{0} h>row_height{0} 0 ?trans_flags&1 1 0 ?trans_flags&1 1 0
     set sec_buttons_center      * 0.5 - w +  + + sec_buttons_width{0} sec_status_width{0} sec_proj_width{0} sec_sel_width{0}
@@ -1239,7 +1257,8 @@ macro drawTransport scale
     set trans.status                + [sec_status sec_status sec_status sec_status] [size_status size_status]
 
     ; draw content in sec_proj
-    set bmp_left                    * [0.5] - - - - - [w] [size_bpm{w}] [size_timesig{w}] [size_automode{w}] [size_rate{w}] [10]
+    set bmp_left                    sec_proj{0}
+    set bmp_left                    ?centered_bpm{0}  * [0.5] - - - - - [w] [size_bpm{w}] [size_timesig{w}] [size_automode{w}] [size_rate{w}] [10]
     
     set trans_bpm                   + + [bmp_left] [0 sec_proj] [size_bpm size_bpm size_bpm size_bpm]
       set trans.bpm.tap             sec_proj{2}==0 [0]  * [1 1 1 0.5] trans_bpm
@@ -1278,6 +1297,7 @@ macro drawTransport scale
     set trans.sel.font              scale{0}==1 [3] scale{0}==1.5 [8] [13]
 endMacro
 
+
 drawTransport 1.0
 
 
@@ -1286,10 +1306,12 @@ set trans.bpm.edit.color   [230 230 230]
 
 set trans.rate.color       text_color
 
+; Ubuntu-Bold-12
 set trans.sel.font         [4]
 set trans.bpm.tap.font     [4]
 set trans.bpm.edit.font    [4]
 set trans.curtimesig.font  [4]
+; Tahoma-Bold-10
 set trans.rate.font        [3]
 
 set trans.bpm.tap.margin   [0 1 0 0 0.5]
@@ -1297,7 +1319,7 @@ set trans.bpm.edit.margin  [0 0 0 3 0.5]
 
 
 ; == distance between main (play/pause) and secondary (bpm/timesig) button groups; if <0 they overlap
-set btns_distance    - trans.bpm.tap{x}  + trans.pause{x} trans.pause{w}
+set btns_distance   h<row_height_x2{0}  - trans.bpm.tap{x}  + trans.pause{x} trans.pause{w}  0
 
 set trans.rew      btns_distance{0}<0   [0]
 set trans.fwd      btns_distance{0}<0   [0]
@@ -1307,17 +1329,17 @@ set trans.repeat   btns_distance{0}<0   [0]
 set trans.stop     btns_distance{0}<0   [0]
 set trans.pause    btns_distance{0}<0   [0]
 
-set trans.bpm.tap       btns_distance{0}<0     [6 trans.bpm.tap trans.bpm.tap trans.bpm.tap]
-set trans.bpm.edit      btns_distance{0}<0     [6 trans.bpm.edit trans.bpm.edit trans.bpm.edit]
-set trans.curtimesig    btns_distance{0}<0   + [6 trans.curtimesig trans.curtimesig trans.curtimesig]   + [trans.bpm.edit]    [trans.bpm.edit{w}]
-set trans.automode      btns_distance{0}<0   + [6 trans.automode trans.automode trans.automode]         + [trans.curtimesig]  [trans.curtimesig{w}]
-set trans.rate.fader    btns_distance{0}<0   + [6 trans.rate.fader trans.rate.fader trans.rate.fader]   + [trans.automode]    [trans.automode{w}]
-set trans.rate          btns_distance{0}<0   + [6 trans.rate trans.rate trans.rate]                     + [trans.rate.fader]  [trans.rate.fader{w}]
+set trans.bpm.tap       btns_distance{0}<0      [6 trans.bpm.tap trans.bpm.tap trans.bpm.tap]
+set trans.bpm.edit      btns_distance{0}<0      [6 trans.bpm.edit trans.bpm.edit trans.bpm.edit]
+set trans.curtimesig    btns_distance{0}<0    + [6 trans.curtimesig trans.curtimesig trans.curtimesig]   + [trans.bpm.edit]    [trans.bpm.edit{w}]
+set trans.automode      btns_distance{0}<0    + [6 trans.automode trans.automode trans.automode]         + [trans.curtimesig]  [trans.curtimesig{w}]
+set trans.rate.fader    btns_distance{0}<0    + [6 trans.rate.fader trans.rate.fader trans.rate.fader]   + [trans.automode]    [trans.automode{w}]
+set trans.rate          btns_distance{0}<0    + [6 trans.rate trans.rate trans.rate]                     + [trans.rate.fader]  [trans.rate.fader{w}]
 
 ; == calc distance between secondary buttons and status (when the status is in the right corner)
-set sec_btns_end          + trans.rate{x} trans.rate{w}
-set status_btns_distance    sec_status_width{0}<status_min{0}   - trans.status{x} sec_btns_end   [0]
+set sec_btns_end            + trans.rate{x} trans.rate{w}
+set status_btns_distance    sec_status_width{0}<status_min{0}   - trans.status{x} sec_btns_end   0
 set trans.status            status_btns_distance{0}<0    + - [0 0 w] [0 0 sec_btns_end]  + [sec_btns_end] [0 trans.status -10 trans.status]
 
 ; == hide status on small width
-set trans.status   btns_distance{0}<0  trans.status{w}<250  [0]
+set trans.status   btns_distance{0}<0  trans.status{w}<status_min{0}  [0]
