@@ -730,7 +730,6 @@ macro drawMcp
     set mcp.trackidx.margin                     + - [0 0 0 mcp.trackidx{3} 0.5] [0 0 0 20] folderstate==1 [12] [0]
 endMacro
 
-
 ; sidebar (pushes other secs right)
 ; fx section (background is baked into mcp_bg)
 ; pan section
@@ -841,13 +840,14 @@ drawMasterMcp 1
 #<
 #>---------------------------------- TRANSPORT ----------------------------------------
 
+clear trans.*
+
 ;returns [padding x, padding y, width, height, width + padding x]
 macro size element   px  py  w  h
   set size_##element  + [px py w h px] [0 0 0 0 w]
 endmacro
 
 macro drawTransport
-    clear trans.*
     set trans.size                  [100 100]
     
     set status_min                  300     ; the size below which status readout looks weird
@@ -928,26 +928,27 @@ macro drawTransport
     set trans.pause                 + + [trans.stop sec_buttons]    [size_stop{2}]  [size_pause size_pause size_pause size_pause]
 
     ; draw content in sec_status
-    set trans.status                + [sec_status sec_status sec_status sec_status] [size_status size_status]
+    set trans.status                + [sec_status sec_status sec_status sec_status]  [size_status size_status]
 
     ; draw content in sec_proj
     set bmp_left                    sec_proj{0}
-    set bmp_left                    ?centered_bpm{0}  * [0.5] - - - - - [w] [size_bpm{w}] [size_timesig{w}] [size_automode{w}] [size_rate{w}] [10]
+    set bmp_left                    ?centered_bpm{0}  * 0.5 - - - - - w  size_bpm{w}  size_timesig{w}  size_automode{w}  size_rate{w}  10
     
-    set trans_bpm                   + + [bmp_left] [0 sec_proj] [size_bpm size_bpm size_bpm size_bpm]
-      set trans.bpm.tap             sec_proj{2}==0 [0]  * [1 1 1 0.5] trans_bpm
-      set trans.bpm.edit            sec_proj{2}==0 [0]  + trans.bpm.tap [0 trans.bpm.tap{h}]
-    set trans.curtimesig            sec_proj{2}==0 [0] + [6] + + [trans_bpm sec_proj] [size_bpm{2}] [size_timesig size_timesig size_timesig size_timesig]
-    set trans.automode              sec_proj{2}==0 [0] + [6] + + [trans.curtimesig sec_proj]] [size_timesig{2}] [size_automode size_automode size_automode size_automode]
+    set trans_bpm                   + + [bmp_left]  [0 sec_proj]  [size_bpm size_bpm size_bpm size_bpm]
+      set trans.bpm.tap             sec_proj{2}==0  [0]  * [1 1 1 0.5] trans_bpm
+      set trans.bpm.edit            sec_proj{2}==0  [0]  + trans.bpm.tap [0 trans.bpm.tap{h}]
+    set trans.curtimesig            sec_proj{2}==0  [0]  + [6] + + [trans_bpm sec_proj] [size_bpm{2}] [size_timesig size_timesig size_timesig size_timesig]
+    set trans.automode              sec_proj{2}==0  [0]  + [6] + + [trans.curtimesig sec_proj]] [size_timesig{2}] [size_automode size_automode size_automode size_automode]
     set trans_rate                  + [6] + + [trans.automode sec_proj] [size_automode{2}] [size_rate size_rate size_rate size_rate]
       set rate_cutoff               - + trans_rate{0} trans_rate{2} w
-      set trans_rate                rate_cutoff{0}>0 - trans_rate [0 0 rate_cutoff{0}] .
+      set trans_rate                rate_cutoff{0}>0  - trans_rate [0 0 rate_cutoff{0}] .
       set trans.rate                sec_proj{2}==0 [0]   + [trans_rate trans_rate] + [-3 0 0 0] [52 0 100 44]
       set trans.rate.fader          sec_proj{2}==0 [0]   + [trans_rate trans_rate] [3 3 40 40]
       set trans.rate.fader.fadermode  1
 
     ; draw content in sec_sel
     set trans.sel                   sec_sel
+
 
     ; >>> Fonts/Colors/Margins
     set trans.curtimesig.color      + text_color [0 0 0 0 43 43 43 255]
@@ -969,8 +970,10 @@ macro drawTransport
     set trans.sel.margin            [4 0 4 0 1]
     set trans.bpm.tap.margin        [0 1 0 0 0.5]
     set trans.bpm.edit.margin       [0 0 0 3 0.5]
-    
-    ; >>> Hide rules
+endMacro
+
+
+macro applyTransHideRules
     ; == distance between main (play/pause) and secondary (bpm/timesig) button groups; if <0 they overlap
     set btn_group_distance  h<row_height_x2{0}  - trans.bpm.tap{x}  + trans.pause{x} trans.pause{w}  0
 
@@ -990,7 +993,7 @@ macro drawTransport
     set trans.rate          btn_group_distance{0}<0   + [6 trans.rate trans.rate trans.rate]                     + [trans.rate.fader]  [trans.rate.fader{w}]
 
     ; == calc distance between secondary buttons and status (when the status is in the right corner)
-    set bpm_group_end           + trans.rate{x} trans.rate{w}
+    set bpm_group_end           + trans.rate{x}  trans.rate{w}
     set status_btns_distance    sec_status_width{0}<status_min{0}   - trans.status{x} bpm_group_end   0
     set trans.status            status_btns_distance{0}<0    + - [0 0 w] [0 0 bpm_group_end]  + [bpm_group_end] [0 trans.status -10 trans.status]
 
@@ -998,4 +1001,6 @@ macro drawTransport
     set trans.status        btn_group_distance{0}<0  trans.status{w}<status_min{0}  [0]
 endMacro
 
+;-------------
 drawTransport
+applyTransHideRules
