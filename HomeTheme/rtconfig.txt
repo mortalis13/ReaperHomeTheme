@@ -474,94 +474,90 @@ applyMasterTcpHideRules
 #<
 #> -------------------------- ENVELOPE CONTROL PANELS ---------------------------------
 
-macro calcEnvSecs scale
-    set envcp.size                              * scale [300 100]
-    set element_h                               * scale 20
-    set envcp_padding                           * scale [7 7]
-    set values_w                                * scale 60
-    set envcp_squash_height                     + + * scale 20 envcp_padding{1} envcp_padding{1}
-    set valuesFlipH                             + + envcp_squash_height * scale 13 envcp_padding{1}
+clear envcp.*
+
+macro calcEnvSecs
+    set envcp.size                              [300 100]
+    set element_h                               20
+    set envcp_padding                           [7 7]
+    set values_w                                60
+    set envLabelMin                             30
+    
+    set EnvcpLabelSize                          140
+    set EnvcpVolSize                            20
+    set EnvLabelAutoMeasured                    100
+    set EnvFolderIndent                         1
+    
+    set envcp_squash_height                     + + 20 envcp_padding{1} envcp_padding{1}
+    set valuesFlipH                             + + envcp_squash_height 13 envcp_padding{1}
     set h_less_border                           - h 1
-    set envcp_padding                           h_less_border{0}<envcp_squash_height{0} + [envcp_padding] * [0 1] / - h_less_border{0} element_h * scale 2
-    set envLabelMin                             * scale 30
-    set Envcp_labelSize                         EnvcpLabelSize{0}==0 EnvLabelAutoMeasured{0}<envLabelMin{0} envLabelMin{0} + EnvLabelAutoMeasured{0} * scale 10 EnvcpLabelSize
-    set this_envcp_indent                       + ?EnvFolderIndent{0} * * scale tcp_indent{0} folderdepth{0} [0] * scale [-3 0 -6] ; subtracting 3px to match the lack of visible borders
-    set main_sec                                - + * [1 0 -1] this_envcp_indent [0 0 w h] h<valuesFlipH{0} [0 0 values_w 0] + * scale [0 0 0 13] [0 0 0 envcp_padding{1}]
-    set values_sec                              h<valuesFlipH{0} + + [main_sec envcp_padding{1} values_w{0}] [main_sec{2}] * scale [0 4 0 13] + [0 main_sec{3} w] * scale [0 0 0 13]
-    set envcpNullElement                        + + [main_sec] [envcp_padding envcp_padding] * scale [0 0 0 20]
+    set envcp_padding                           h_less_border{0}<envcp_squash_height{0} + [envcp_padding] * [0 1] / - h_less_border{0} element_h 2
+    set Envcp_labelSize                         EnvcpLabelSize{0}==0 EnvLabelAutoMeasured{0}<envLabelMin{0} envLabelMin{0} + EnvLabelAutoMeasured{0} 10 EnvcpLabelSize
+    set this_envcp_indent                       + ?EnvFolderIndent{0} * tcp_indent{0} folderdepth{0} [0] [-3 0 -6] ; subtracting 3px to match the lack of visible borders
+    set main_sec                                - + * [1 0 -1] this_envcp_indent [0 0 w h] h<valuesFlipH{0} [0 0 values_w 0] + [0 0 0 13] [0 0 0 envcp_padding{1}]
+    set values_sec                              h<valuesFlipH{0}  + + [main_sec envcp_padding{1} values_w{0}]  [main_sec{2}]  [0 1 0 13] \
+                                                                  + [0 main_sec{3} w] [0 -4 0 13]
+    set envcpNullElement                        + + [main_sec] [envcp_padding envcp_padding] [0 0 0 20]
     set previous_element                        envcpNullElement        ; Let's start at the very beginning. A very good place to start.
     set addCont                                 envcp_type==4 [30 1] [0 0]
 endMacro
 
-macro envThen element width use_padding
-    ; apply scale
-    set s_width             * width scale
 
-    set prev_end            + [previous_element] [previous_element{2}]                                  ; find the end of the previous element
-    set element             [prev_end previous_element s_width element_h]                                   ; ...and place the element there
+macro envThen element width use_padding
+    set prev_end                         + [previous_element] [previous_element{2}]                                  ; find the end of the previous element
+    set element                          [prev_end previous_element width element_h]                                   ; ...and place the element there
 
     ; x-axis
-    set element             ?use_padding + [envcp_padding]                                              ; if x-padding is required, add it
-    set this_end            - + + [element] [element{2}] [envcp_padding] [main_sec]                     ; okay, and what does that make the x-end of this element, realtive to main_sec?
+    set element                          ?use_padding + [envcp_padding]                                              ; if x-padding is required, add it
+    set this_end                         - + + [element] [element{2}] [envcp_padding] [main_sec]                     ; okay, and what does that make the x-end of this element, realtive to main_sec?
 
     ; y-axis
-    set next_row            + [0 element] [0 previous_element{3}]                                       ; find the y of the next row
-    set element             this_end{0}>main_sec{2} + [main_sec next_row element element] envcp_padding ; move it to the next row
-    set this_end            - + + [element] [element{2}] [envcp_padding] [main_sec]                     ; recalculate this_end, now that the element is on a new row
-    set element             this_end{0}>main_sec{2} [. . 0 .]                                           ; ... and cull if there's still not enough main_sec width to fit
-    set this_y_end          + + element{1} element{3} envcp_padding{1}                                  ; find its bottom
-    set element             this_y_end{0}>main_sec{3} [0] !previous_element{1} [0] .                    ; cull if there's not enough height to fit, or if previous_element was culled
-    set main_sec_last       element{3}>0 this_y_end{0} .
+    set next_row                         + [0 element] [0 previous_element{3}]                                       ; find the y of the next row
+    set element                          this_end{0}>main_sec{2} + [main_sec next_row element element] envcp_padding ; move it to the next row
+    set this_end                         - + + [element] [element{2}] [envcp_padding] [main_sec]                     ; recalculate this_end, now that the element is on a new row
+    set element                          this_end{0}>main_sec{2} [. . 0 .]                                           ; ... and cull if there's still not enough main_sec width to fit
+    set this_y_end                       + + element{1} element{3} envcp_padding{1}                                  ; find its bottom
+    set element                          this_y_end{0}>main_sec{3} [0] !previous_element{1} [0] .                    ; cull if there's not enough height to fit, or if previous_element was culled
+    set main_sec_last                    element{3}>0 this_y_end{0} .
 
     ; values readout control
-    set valuesRoom          - - main_sec{3} this_y_end{0} envcp_padding{1}                              ; is the remaining height after this element enough for the values to fit?
-    set hideValues          valuesRoom{0}<8 element{3}!=0 [1] .                                         ; if not, and this element isn't already hidden, cull the values
+    set valuesRoom                       - - main_sec{3} this_y_end{0} envcp_padding{1}                              ; is the remaining height after this element enough for the values to fit?
+    set hideValues                       valuesRoom{0}<8 element{3}!=0 [1] .                                         ; if not, and this element isn't already hidden, cull the values
 
-    set previous_element element
+    set previous_element                 element
 endmacro
 
-macro drawEnvcp scale
+
+macro drawEnvcp
     set envcp.label.color                       [184 184 184]
-        set envcp.label.margin                  * scale [2 0 2 0 0]
-        set envcp.label.font                    scale{0}==1 [1] scale{0}==1.5 [6] [11]
-    set envcp.value                             + values_sec [0 0 0 4]
-        set envcp.value.font                    scale{0}==1 [1] scale{0}==1.5 [6] [11]
+        set envcp.label.margin                  [2 0 2 0 0]
+        set envcp.label.font                    [1]
+    set envcp.value                             w<70  [0]  + values_sec [0 0 0 4]
+        set envcp.value.font                    [2]
         set envcp.value.color                   [92 184 169]
-        set envcp.value.margin                  * [0 0 scale 0 1] [0 0 7 0 1]
+        set envcp.value.margin                  * [0 0 1 0 1] [0 0 7 0 1]
     set envcp.fader.color                       [54 217 190]
-        set env_fader_w                         * 21 scale
-        set envcp.fader.fadermode               envcp.fader{w}>env_fader_w{0} [0] [1]
+        set env_fader_w                         21
+        set envcp.fader.fadermode               0
 endMacro
 
-
-set EnvcpLabelSize         140
-set EnvcpVolSize           20
-set EnvLabelAutoMeasured   100
-set EnvFolderIndent        1
-
-clear envcp.*
-front       envcp.fader
-
+;-------------
+front             envcp.fader
 
 ;-------------
 calcEnvSecs
 
-;    element                size    padding?
-envThen envcp.arm           20          0
-envThen envcp.bypass        15          0
-envThen envcp.label   envcp_labelSize   0
-envThen envcp.fader    EnvcpVolSize     0
-envThen envcp.mod       addCont{0}  addCont{1}
-envThen envcp.learn     addCont{0}  addCont{1}
-envThen envcp.hide          36          1
-
-set values_sec   h<valuesFlipH{0}   - [values_sec values_sec values_sec values_sec] [0 3]
+;    element                  size            padding?
+envThen envcp.arm              20                0
+envThen envcp.bypass           15                0
+envThen envcp.label      envcp_labelSize         0
+envThen envcp.fader       EnvcpVolSize           0
+envThen envcp.mod          addCont{0}        addCont{1}
+envThen envcp.learn        addCont{0}        addCont{1}
+envThen envcp.hide             36                1
 
 ;-------------
 drawEnvcp
-
-set envcp.value.font  [2]
-set envcp.value       w<70  [0]
 
 
 
