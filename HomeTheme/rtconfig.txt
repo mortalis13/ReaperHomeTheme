@@ -564,26 +564,39 @@ drawEnvcp
 #<
 #>---------------------------------- THE MIXER ----------------------------------------
 
-macro doModeLogic variable paramIdx
-    set variable param##paramIdx##&1 ?track_selected 1 0
-    set variable param##paramIdx##&2 !track_selected 1 variable
-    set variable param##paramIdx##&4 ?recarm 1 variable
-    set variable param##paramIdx##&8 !recarm 1 variable
-endmacro
+clear mcp.*
 
-macro drawMcp scale
-    set hide_inputFX_s                          * scale hide_inputFX
-    set hide_input_s                            * scale hide_input
-    set hide_pan_labels_s                       * scale hide_pan_labels
-    set hide_pan_s                              * scale hide_pan
-    set hide_volume_label_s                     * scale hide_volume_label
-    set extmixer_w_s                            * scale extmixer_w
+macro drawMcp
+    ; >>>> [VARS]
+    set mcp_indent                     15
+    set mcp_control_align              1
 
-    set mcp_indent_s                            * scale mcp_indent
-    set mcp_meterExp_s                          * scale mcp_meterExp
+    set sidebarMode                    0
+    set narrowMode                     0
+    set meterExpMode                   0
+    set labelsMode                     1
 
-    clear mcp.*
-    front                                       mcp.label mcp.volume.label mcp.volume mcp.recarm mcp.recmon mcp.mute mcp.solo mcp.env mcp.io mcp.phase mcp.width mcp.trackidx mcp.folder
+    set mcp_meterExp                   4
+    set mcp_border                     0
+    
+    set hide_inputFX                   [400]   ; height below which input effects is hidden.
+    set hide_input                     [350]   ; height below which input dropdown is hidden.
+    set hide_pan_labels                [320]   ; height below which pan labels are hidden.
+    set hide_pan                       [260]   ; height below which pan controls are hidden.
+    set hide_volume_label              [250]   ; height below which volume label is hidden.
+    set extmixer_w                     [86]    ; width of the extmixer when set as a sidebar
+    
+    ; >>>> Calculations
+    set hide_inputFX_s                          hide_inputFX
+    set hide_input_s                            hide_input
+    set hide_pan_labels_s                       hide_pan_labels
+    set hide_pan_s                              hide_pan
+    set hide_volume_label_s                     hide_volume_label
+    set extmixer_w_s                            extmixer_w
+
+    set mcp_indent_s                            mcp_indent
+    set mcp_meterExp_s                          mcp_meterExp
+
     set mcp_meterExp_s                          ?meterExpMode{0} . 1
     set panLabelsMode                           h<hide_pan_labels_s{x} 0 labelsMode
     set gapmode                                 mcp_border{0}<1 0 \
@@ -595,154 +608,140 @@ macro drawMcp scale
     set nchan_offs_half                         / nchan_offs 2
     set nchan_offs_third                        / nchan_offs 3
     set nchan_offs_twothird                     * nchan_offs_third 2
+    
     set mcp.size                                + + \
                                                     +   ?narrowMode{0} \
-                                                            * scale [54 371] \
-                                                            * scale [86 371] \
+                                                            [54 371] \
+                                                            [86 371] \
                                                         mcp_meterExp_s{0}>0 [nchan_offs{0}] [0] \
-                                                        +   gapmode{0}>=1 * scale [14] [0] \
+                                                        +   gapmode{0}>=1 [14] [0] \
                                                     !sidebarMode{0} [0] [extmixer_w_s] \
-                                                    * [0 0 0 scale{0}] + 180 * mcp_maxfolderdepth mcp_indent_s ; set the min height
-    set sidebar_sec                             + + [0 0 0 0] gapmode{0}>=1 gapmode{0}!=2 * scale [0 0 14] [0] [0] !sidebarMode{0} [0] [0 0 extmixer_w_s{0}]
-    set fx_sec                                  + [sidebar_sec{2} 0 mcp.size{0}] * scale [0 0 0 33]
-    set pan_sec                                 + [sidebar_sec{2} fx_sec{3} mcp.size{0}] * scale !panLabelsMode{0} h<hide_pan_s{0} [0 0 0 6] [0 0 0 28] [0 0 0 48]
-    set in_sec                                  + + [sidebar_sec{2} pan_sec{1}] [0 pan_sec{3} mcp.size{0}] * scale h<hide_input_s{0} [0 0 0 22] h<hide_inputFX_s{0} [0 0 0 42] [0 0 0 54]
+                                                    * [0 0 0 1] + 180 * mcp_maxfolderdepth mcp_indent_s ; set the min height
+    
+    set sidebar_sec                             + + [0 0 0 0] gapmode{0}>=1 gapmode{0}!=2 [0 0 14] [0] [0] !sidebarMode{0} [0] [0 0 extmixer_w_s{0}]
+    set fx_sec                                  + [sidebar_sec{2} 0 mcp.size{0}] [0 0 0 33]
+    set pan_sec                                 + [sidebar_sec{2} fx_sec{3} mcp.size{0}] !panLabelsMode{0} h<hide_pan_s{0} [0 0 0 6] [0 0 0 28] [0 0 0 48]
+    set in_sec                                  + + [sidebar_sec{2} pan_sec{1}] [0 pan_sec{3} mcp.size{0}] h<hide_input_s{0} [0 0 0 22] h<hide_inputFX_s{0} [0 0 0 42] [0 0 0 54]
     set bot_sec_height                          ?mcp_control_align{0} \
-                                                    + * scale 47 * mcp_maxfolderdepth mcp_indent_s \
-                                                    + * scale 47 * folderdepth mcp_indent_s
+                                                    + 47 * mcp_maxfolderdepth mcp_indent_s \
+                                                    + 47 * folderdepth mcp_indent_s
     set bot_sec                                 - [0 h mcp.size{0} bot_sec_height{0}] [0 bot_sec_height{0}]
     set stretch_sec_start                       + + fx_sec{3} pan_sec{3} in_sec{3}
     set stretch_sec_height                      - - - - h fx_sec{3} pan_sec{3} in_sec{3} bot_sec{3}
     set stretch_sec                             [sidebar_sec{2} stretch_sec_start{0} mcp.size{0} stretch_sec_height{0}]
     set sidebar_sec                             + + + sidebar_sec [0 0 0 stretch_sec{1}] [0 0 0 stretch_sec{3}] [0 0 0 1]
-    set padding_reduction_h                     * scale [300 200]
-    set padding                                 * scale stretch_sec_height{0}<padding_reduction_h{0} stretch_sec_height{0}<padding_reduction_h{1} [0 2] [0 3] [0 4]
+    set padding_reduction_h                     [300 200]
+    set padding                                 stretch_sec_height{0}<padding_reduction_h{0} stretch_sec_height{0}<padding_reduction_h{1} [0 2] [0 3] [0 4]
     set mcp.extmixer.mode                       !sidebarMode{0} [0] [1]
-    set mcp.extmixer.position                   + + sidebar_sec + [1 0 1] * scale [0 2 0 -2] gapmode{0}>=1 gapmode{0}!=2 * scale [13 0 -13] [0] [0]
-        set mcp.fxlist.font                     scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
-        set mcp.fxlist.margin                   * [scale scale scale scale 1 scale] [4 0 4 0 0.5 14]
-        set mcp.sendlist.font                   scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
-        set mcp.sendlist.margin                 * scale [4 0 4 0 0 0 14]
-        set mcp.fxparm.font                     scale{0}==1 [1 24 0 0 -1] scale{0}==1.5 [6 36 0 0 -4] [11 48 0 0 -6]
-        set mcp.fxparm.font                     + . os_type==1 * scale [0 0 0 0 3] [0]
-        set mcp.fxparm.margin                   * scale [2 0 4 0 0 14]
-    set mcp.fx                                  + [fx_sec 0 nchan_offs_twothird{0}] * scale ?narrowMode{0} [4 7 28 20] [7 7 43 20]
-    set mcp.fxbyp                               + + [mcp.fx mcp.fx nchan_offs_third{0}] [mcp.fx{2}] * scale ?narrowMode{0} [0 0 19 20] [0 0 29 20]
+    set mcp.extmixer.position                   + + sidebar_sec + [1 0 1] [0 2 0 -2] gapmode{0}>=1 gapmode{0}!=2 [13 0 -13] [0] [0]
+    set mcp.fx                                  + [fx_sec 0 nchan_offs_twothird{0}] ?narrowMode{0} [4 7 28 20] [7 7 43 20]
+    set mcp.fxbyp                               + + [mcp.fx mcp.fx nchan_offs_third{0}] [mcp.fx{2}] ?narrowMode{0} [0 0 19 20] [0 0 29 20]
 
     set mcp.pan                                 ?narrowMode{0} \
-                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] * scale !panLabelsMode{0} [3 6 48 9] [3 15 48 9] \
-                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] * scale !panLabelsMode{0} [28 4 20 20] [26 7 20 20] \
-                                                                                                                    + [nchan_offs_half{0}] * scale !panLabelsMode{0} [18 4 20 20] [18 7 20 20] \
-                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] * scale !panLabelsMode{0} [7 6 73 9] [7 15 73 9] \
-                                                                                            width_visible{0}!=0     + [nchan_offs_third{0}] * scale !panLabelsMode{0} [20 4 20 20] [20 7 20 20] \
-                                                                                            + [nchan_offs_half{0}] * scale !panLabelsMode{0} [33 4 20 20] [33 7 20 20]
+                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] !panLabelsMode{0} [3 6 48 9] [3 15 48 9] \
+                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] !panLabelsMode{0} [28 4 20 20] [26 7 20 20] \
+                                                                                                                    + [nchan_offs_half{0}] !panLabelsMode{0} [18 4 20 20] [18 7 20 20] \
+                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] !panLabelsMode{0} [7 6 73 9] [7 15 73 9] \
+                                                                                            width_visible{0}!=0     + [nchan_offs_third{0}] !panLabelsMode{0} [20 4 20 20] [20 7 20 20] \
+                                                                                            + [nchan_offs_half{0}] !panLabelsMode{0} [33 4 20 20] [33 7 20 20]
       set mcp.pan.fadermode                     gl_fader_swap
-      set mcp.pan.color                         gl_pan_color
       set mcp.pan.label                         ?narrowMode{0} \
-                                                    !panLabelsMode{0} [0] + [pan_sec mcp.pan] width_visible{0}!=0 width_visible{0}==2 + [nchan_offs_half{0}] * scale [11 -11 35 9] + [nchan_offs_half{0}] h<hide_input_s{0} [0] * scale [17 25 35 10] + [nchan_offs_half{0}] * scale [10 25 35 10] \
-                                                    !panLabelsMode{0} [0] + [pan_sec mcp.pan] width_visible{0}!=0 width_visible{0}==2 + [nchan_offs_half{0}] * scale [23 -11 40 9] + [nchan_offs_third{0}] * scale [8 25 35 10] + [nchan_offs_half{0}] * scale [26 25 35 10]
-      set mcp.pan.label.color                   val_color
-      set mcp.pan.label.font                    scale==1 [1] scale==1.5 [6] [11]
-      set mcp.pan.label.margin                  [0 0 0 0 0.5]
+                                                    !panLabelsMode{0} [0] + [pan_sec mcp.pan] width_visible{0}!=0 width_visible{0}==2 + [nchan_offs_half{0}] [11 -11 35 9] + [nchan_offs_half{0}] h<hide_input_s{0} [0] [17 25 35 10] + [nchan_offs_half{0}] [10 25 35 10] \
+                                                    !panLabelsMode{0} [0] + [pan_sec mcp.pan] width_visible{0}!=0 width_visible{0}==2 + [nchan_offs_half{0}] [23 -11 40 9] + [nchan_offs_third{0}] [8 25 35 10] + [nchan_offs_half{0}] [26 25 35 10]
     set mcp.width                               ?narrowMode{0} \
-                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] * scale !panLabelsMode{0} [3 14 48 9] [3 23 48 9] \
-                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] + [nchan_offs_third{0}] !panLabelsMode{0} * scale [7 20 20 20] h<hide_input{0} [9 31 20 20] [9 46 20 20] [0] \
-                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] * scale !panLabelsMode{0} [7 14 73 9] [7 23 73 9] \
-                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] + [nchan_offs_third{0}] * scale !panLabelsMode{0} [48 4 20 20] [48 7 20 20] [0]
+                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] !panLabelsMode{0} [3 14 48 9] [3 23 48 9] \
+                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] + [nchan_offs_third{0}] !panLabelsMode{0} [7 20 20 20] h<hide_input{0} [9 31 20 20] [9 46 20 20] [0] \
+                                                    h<hide_pan_s{0} [0] + [pan_sec pan_sec]     width_visible{0}==2     + [0 0 nchan_offs{0}] !panLabelsMode{0} [7 14 73 9] [7 23 73 9] \
+                                                                                                width_visible{0}!=0     + [nchan_offs_third{0}] + [nchan_offs_third{0}] !panLabelsMode{0} [48 4 20 20] [48 7 20 20] [0]
       set mcp.width.fadermode                   gl_fader_swap
-      set mcp.width.color                       gl_width_color
       set mcp.width.label                       ?narrowMode{0} \
-                                                    !panLabelsMode{0} [0] + [0 mcp.width] width_visible{0}!=0 width_visible{0}==2 + [mcp.pan.label] * scale [0 11 35 9] h<hide_inputFX_s{0} [0] [3 25 35 9] [0] \
-                                                    !panLabelsMode{0} [0] + [0 mcp.width] width_visible{0}!=0 width_visible{0}==2 + [mcp.pan.label] * scale [0 11 40 9] + [nchan_offs_third{0}] + * scale [-5 25 35 10] [mcp.width] [0]
-      set mcp.width.label.color                 val_color
-      set mcp.width.label.font                  scale==1 [1] scale==1.5 [6] [11]
-      set mcp.width.label.margin                [0 0 0 0 0.5]
-    set mcp.recinput                            h<hide_input_s{0} [0] + [in_sec in_sec nchan_offs{0}] * scale ?narrowMode{0} width_visible{0}==1 [0] [6 0 43 16] [6 0 75 16]
-      set mcp.recinput.color                    ?track_selected [225 225 225] [200 200 200]
-      set mcp.recinput.font                     scale==1 [1] scale==1.5 [6] [11]
-      set mcp.recinput.margin                   * scale [4 0 15 0 0]
-    set mcp.fxin                                ?narrowMode{0} [0] h<hide_inputFX_s{0} [0] + [mcp.recinput mcp.recinput] + [nchan_offs{0}] * scale [0 16 75 12]
-    set mcp.recmode                             ?narrowMode{0} [0] + + [in_sec in_sec nchan_offs{0}] [0 mcp.fxin{3}] * scale + [6 4 41 16] mcp.recinput{3}>0 [0 16] [0 -4]
-    set mcp.meter                               ?narrowMode{0} + * scale [4 4 20 -31] [stretch_sec stretch_sec nchan_offs{0} stretch_sec] \
-                                                     + [stretch_sec stretch_sec nchan_offs{0} stretch_sec] * scale h<hide_volume_label_s{0} [4 4 20 -4] !labelsMode{0} [4 4 20 -4] [4 23 20 -23]
+                                                    !panLabelsMode{0} [0] + [0 mcp.width] width_visible{0}!=0 width_visible{0}==2 + [mcp.pan.label] [0 11 35 9] h<hide_inputFX_s{0} [0] [3 25 35 9] [0] \
+                                                    !panLabelsMode{0} [0] + [0 mcp.width] width_visible{0}!=0 width_visible{0}==2 + [mcp.pan.label] [0 11 40 9] + [nchan_offs_third{0}] + [-5 25 35 10] [mcp.width] [0]
+    set mcp.recinput                            h<hide_input_s{0} [0] + [in_sec in_sec nchan_offs{0}] ?narrowMode{0} width_visible{0}==1 [0] [6 0 43 16] [6 0 75 16]
+    set mcp.fxin                                ?narrowMode{0} [0] h<hide_inputFX_s{0} [0] + [mcp.recinput mcp.recinput] + [nchan_offs{0}] [0 16 75 12]
+    set mcp.recmode                             ?narrowMode{0} [0] + + [in_sec in_sec nchan_offs{0}] [0 mcp.fxin{3}] + [6 4 41 16] mcp.recinput{3}>0 [0 16] [0 -4]
+    set mcp.meter                               ?narrowMode{0} + [4 4 20 -31] [stretch_sec stretch_sec nchan_offs{0} stretch_sec] \
+                                                     + [stretch_sec stretch_sec nchan_offs{0} stretch_sec] h<hide_volume_label_s{0} [4 4 20 -4] !labelsMode{0} [4 4 20 -4] [4 23 20 -23]
       set mcp.meter.vu.div                      [1 1]
-      set mcp.meter.readout.color               !labelsMode{0} [0 0 0 0 0 0 0 0] [100 100 100 255 255 183 171 255]
-      set mcp.meter.scale.color.lit.bottom      !labelsMode{0} [0 0 0 0 0 0 0 0] [0 0 0 170 0 0 0 0]
-      set mcp.meter.scale.color.lit.top         !labelsMode{0} [0 0 0 0 0 0 0 0] [0 0 0 170 0 0 0 0]
-      set mcp.meter.scale.color.unlit.bottom    !labelsMode{0} [0 0 0 0 0 0 0 0] ?recarm [255 64 0 255 0 0 0 0] [255 255 255 60 0 0 0 0]
-      set mcp.meter.scale.color.unlit.top       !labelsMode{0} [0 0 0 0 0 0 0 0] ?recarm [255 64 0 255 0 0 0 0] [255 255 255 60 0 0 0 0]
     set mcp.volume.label                        ?narrowMode{0} [0] \
-                                                    + [stretch_sec stretch_sec mcp.meter{2}] * scale h<hide_volume_label_s{0} [1 0 28 4] !labelsMode{0} [1 0 28 4] [1 0 28 23]
+                                                    + [stretch_sec stretch_sec mcp.meter{2}] h<hide_volume_label_s{0} [1 0 28 4] !labelsMode{0} [1 0 28 4] [1 0 28 23]
                                                     ; + h<hide_volume_label_s{0} [1 0 28 4] !labelsMode{0} [1 0 28 4] [1 0 28 23] [stretch_sec stretch_sec mcp.meter{2}]
-      set mcp.volume                            ?narrowMode{0} + - + [stretch_sec stretch_sec] [nchan_offs_half stretch_sec{3}] * scale [-4 21] * scale [0 0 21 21] \
-                                                    - + * [1 1 scale 1] [mcp.meter stretch_sec 21 stretch_sec] [mcp.meter{2} mcp.volume.label{3}] [-4 0 0 mcp.volume.label{3}]
-      set mcp.volume.label.color                mcp.volume.label{h}>2 [100 100 100] [38 38 38]
-      set mcp.volume.label.font                 scale==1 [1] scale==1.5 [6] [11]
-      set mcp.volume.label.margin               * [scale scale scale scale 1] ?narrowMode{0} [0 80 0 0 0.5] [0 4 0 0 0.5]
-    set mcp.recarm                              + * scale [0 0 36 24] ?narrowMode{0} - + [mcp.meter{2}] [stretch_sec stretch_sec] * scale [-1 17] \
-                                                        + - [stretch_sec stretch_sec] * scale [-29 17] [mcp.meter{2}]
-    set mcp.recmon                              + + [0 padding] [mcp.recarm mcp.recarm] * scale [7 20 21 20]
-    set mcp.mute                                + + [0 padding] [mcp.recmon mcp.recmon] * scale [0 19 21 20]
-    set mcp.solo                                + + [0 padding] [mcp.mute mcp.mute] * scale [0 21 21 20]
-    set mcp_io_hide_h                           * scale 106
-    set mcp.io                                  stretch_sec_height{0}<mcp_io_hide_h{0} [0] + + [0 padding] [mcp.solo mcp.solo] * scale !labelsMode{0} [-1 23 23 22] [-1 23 23 30]
-    set mcp_env_hide_h                          * scale [125 141]
+      set mcp.volume                            ?narrowMode{0} + - + [stretch_sec stretch_sec] [nchan_offs_half stretch_sec{3}] [-4 21] [0 0 21 21] \
+                                                    - + * [1 1 1 1] [mcp.meter stretch_sec 21 stretch_sec] [mcp.meter{2} mcp.volume.label{3}] [-4 0 0 mcp.volume.label{3}]
+    set mcp.recarm                              + [0 0 36 24] ?narrowMode{0} - + [mcp.meter{2}] [stretch_sec stretch_sec] [-1 17] \
+                                                        + - [stretch_sec stretch_sec] [-29 17] [mcp.meter{2}]
+    set mcp.recmon                              + + [0 padding] [mcp.recarm mcp.recarm] [7 20 21 20]
+    set mcp.mute                                + + [0 padding] [mcp.recmon mcp.recmon] [0 19 21 20]
+    set mcp.solo                                + + [0 padding] [mcp.mute mcp.mute] [0 21 21 20]
+    set mcp_io_hide_h                           106
+    set mcp.io                                  stretch_sec_height{0}<mcp_io_hide_h{0} [0] + + [0 padding] [mcp.solo mcp.solo] !labelsMode{0} [-1 23 23 22] [-1 23 23 30]
+    set mcp_env_hide_h                          [125 141]
     set mcpHideEnv                              !labelsMode{0} stretch_sec_height{0}<mcp_env_hide_h{0} 1 0 stretch_sec_height{0}<mcp_env_hide_h{1} 1 0
-    set mcp.env                                 ?mcpHideEnv{0} [0 0 0 0] + [0 stretch_sec{3}] + [mcp.io stretch_sec] * scale !labelsMode{0} [1 -22 21 22] [1 -30 21 30]
-    set mcp_phase_hide_h                        * scale [144 162]
+    set mcp.env                                 ?mcpHideEnv{0} [0 0 0 0] + [0 stretch_sec{3}] + [mcp.io stretch_sec] !labelsMode{0} [1 -22 21 22] [1 -30 21 30]
+    set mcp_phase_hide_h                        [144 162]
     set mcpHidePhase                            !labelsMode{0} stretch_sec_height{0}<mcp_phase_hide_h{0} 1 0 stretch_sec_height{0}<mcp_phase_hide_h{1} 1 0
-    set mcp.phase                               ?mcpHidePhase{0} [0] + [mcp.env mcp.env] - * scale [3 -18 16 18] padding
-    set mcp.label                               + + + * scale \
+    set mcp.phase                               ?mcpHidePhase{0} [0] + [mcp.env mcp.env] - [3 -18 16 18] padding
+    set mcp.label                               + + + \
                                                     gapmode{0}==1 !sidebarMode{0} [14 0 -14 27]  [13 0 -13 27] \
                                                     gapmode{0}==2 [0 0 -14 27] \
                                                     [0 0 0 27] \
                                                     [0 bot_sec mcp.size{0}] \
                                                     ?mcp_control_align{0} * - mcp_maxfolderdepth folderdepth [0 0 0 mcp_indent_s{0}] [0]
-      set mcp.label.margin                      * [scale scale scale scale 1] [4 0 4 3 0.5]
-      set mcp.label.font                        scale==1 [3] scale==1.5 [8] [13]
     set mcp.trackidx                            + + [0 bot_sec] [0 mcp.label{3}] - [0 0 mcp.size{0} bot_sec_height{0}] [0 0 0 mcp.label{3}]
-      set mcp.trackidx.margin                   + - [0 0 0 mcp.trackidx{3} 0.5] * scale [0 0 0 20] folderstate==1 * scale [12] [0]
-      set mcp.trackidx.color                    ?track_selected [50 50 50] .
-      set mcp.trackidx.font                     scale==1 [3] scale==1.5 [8] [13]
-    set mcp.folder                              + + [0 bot_sec] [0 mcp.label{3}] folderstate<0 + + [mcp.size] [sidebar_sec{2}] * scale [-21 -2 21 22] * scale [0 -2 18 22]
+    set mcp.folder                              + + [0 bot_sec] [0 mcp.label{3}] folderstate<0 + + [mcp.size] [sidebar_sec{2}] [-21 -2 21 22] [0 -2 18 22]
 
+    
+    ; >>>> Fonts/Colors/Margins
+    set mcp.fxlist.font                         [1 16 0 0 0 0 1 4]
+    set mcp.sendlist.font                       [1 16 0 0 0 0 1 4]
+    set mcp.fxparm.font                         [1 24 0 0 -1]
+    set mcp.fxparm.font                         + . os_type==1 [0 0 0 0 3] [0]
+    set mcp.pan.label.font                      [1]
+    set mcp.width.label.font                    [1]
+    set mcp.recinput.font                       [1]
+    set mcp.volume.label.font                   [1]
+    set mcp.label.font                          [3]
+    set mcp.trackidx.font                       [3]
+    
+    set mcp.label.color                         ?track_selected  [240 240 240]  [200 200 200]
+    set mcp.pan.color                           gl_pan_color
+    set mcp.width.color                         gl_width_color
+    set mcp.width.label.color                   val_color
+    set mcp.recinput.color                      ?track_selected [225 225 225] [200 200 200]
+    set mcp.trackidx.color                      ?track_selected [50 50 50] .
+
+    set mcp.volume.label.color                  [240 240 240]
+    set mcp.pan.label.color                     ?track_selected  [50 50 50]  [240 240 240]
+
+    set mcp.meter.readout.color                 [240 240 240]
+    set mcp.meter.scale.color.unlit.bottom      [240 240 240]
+    set mcp.meter.scale.color.unlit.top         [240 240 240]
+    set mcp.meter.scale.color.lit.bottom        [0 0 0]
+    set mcp.meter.scale.color.lit.top           [0 0 0]
+    
+    set mcp.fxlist.margin                       * [1 1 1 1 1 1] [4 0 4 0 0.5 14]
+    set mcp.sendlist.margin                     [4 0 4 0 0 0 14]
+    set mcp.fxparm.margin                       [2 0 4 0 0 14]
+    set mcp.pan.label.margin                    [0 0 0 0 0.5]
+    set mcp.width.label.margin                  [0 0 0 0 0.5]
+    set mcp.recinput.margin                     [4 0 15 0 0]
+    set mcp.volume.label.margin                 * [1 1 1 1 1] ?narrowMode{0} [0 80 0 0 0.5] [0 4 0 0 0.5]
+    set mcp.label.margin                        * [1 1 1 1 1] [4 0 4 3 0.5]
+    set mcp.trackidx.margin                     + - [0 0 0 mcp.trackidx{3} 0.5] [0 0 0 20] folderstate==1 [12] [0]
 endMacro
 
 
-set hide_inputFX                [400]   ; height below which input effects is hidden.
-set hide_input                  [350]   ; height below which input dropdown is hidden.
-set hide_pan_labels             [320]   ; height below which pan labels are hidden.
-set hide_pan                    [260]   ; height below which pan controls are hidden.
-set hide_volume_label           [250]   ; height below which volume label is hidden.
-set extmixer_w                  [86]    ; width of the extmixer when set as a sidebar
+; sidebar (pushes other secs right)
+; fx section (background is baked into mcp_bg)
+; pan section
+; input section (show/hide inputFX on resize / recarm, with user override)
+; stretch section (recarm pokes above)
+; bottom section (name resize on maxfolderdepth)
 
-  ; sidebar (pushes other secs right)
-  ; fx section (background is baked into mcp_bg)
-  ; pan section
-  ; input section (show/hide inputFX on resize / recarm, with user override)
-  ; stretch section (recarm pokes above)
-  ; bottom section (name resize on maxfolderdepth)
+;-------------
+front           mcp.label mcp.volume.label mcp.volume mcp.recarm mcp.recmon mcp.mute mcp.solo mcp.env mcp.io mcp.phase mcp.width mcp.trackidx mcp.folder
 
-set mcp_indent              15
-set mcp_control_align       1
-
-doModeLogic sidebarMode     25
-doModeLogic narrowMode      26
-doModeLogic meterExpMode    27
-doModeLogic labelsMode      28
-
-set mcp_meterExp            4
-set mcp_border              0
-
-drawMcp 1
-
-
-set mcp.volume.label.color    [240 240 240]
-set mcp.pan.label.color       ?track_selected  [50 50 50]  [240 240 240]
-
-set mcp.meter.readout.color             [240 240 240]
-set mcp.meter.scale.color.unlit.bottom  [240 240 240]
-set mcp.meter.scale.color.unlit.top     [240 240 240]
+drawMcp
 
 
 
@@ -829,7 +828,6 @@ macro drawMasterMcp scale
 endmacro
 
 drawMasterMcp 1
-
 
 set master.mcp.volume.label.color              [240 240 240]
 set master.mcp.pan.label.color                 [240 240 240]
