@@ -740,7 +740,6 @@ endMacro
 
 ;-------------
 front           mcp.label mcp.volume.label mcp.volume mcp.recarm mcp.recmon mcp.mute mcp.solo mcp.env mcp.io mcp.phase mcp.width mcp.trackidx mcp.folder
-
 drawMcp
 
 
@@ -748,94 +747,94 @@ drawMcp
 #<
 #>--------------------------------- MASTER MIXER --------------------------------------
 
-  ; --------------- User adjustable values. Edit without fear. -----------------
+clear master.mcp.*
 
-set hide_inputFX                [400] ; height below which input effects is hidden.
-set hide_pan_labels             [320] ; height below which pan labels are hidden.
-set hide_pan                    [260] ; height below which pan controls are hidden.
-set hide_volume_label           [200] ; height below which volume label is hidden.
+macro drawMasterMcp
+    ; >>>> [VARS]
+    set hide_inputFX                       [400] ; height below which input effects is hidden.
+    set hide_pan_labels                    [320] ; height below which pan labels are hidden.
+    set hide_pan                           [260] ; height below which pan controls are hidden.
+    set hide_volume_label                  [200] ; height below which volume label is hidden.
 
-  ; ------- End of user adjustable values. From here on may be dragons. ---------
+    ; >>>> Calculations
+    set master.mcp.size                             + [125 370] [0 0 0 mcp.size]
 
-macro drawMasterMcp scale
-
-    clear master.mcp.*
-    front                                           master.mcp.menubutton master.mcp.io master.mcp.env master.mcp.mute master.mcp.solo
-    set master.mcp.size                             + * scale [125 370] [0 0 0 mcp.size]
-    set hide_pan_sm                                 * scale hide_pan
-    set hide_pan_labels_sm                          * scale hide_pan_labels
-    set fx_sec                                      + [0 0 master.mcp.size{0}] * scale [0 0 0 27]
-    set pan_sec                                     + [0 fx_sec{3} master.mcp.size{0}] * scale h<hide_pan_labels_sm{0} h<hide_pan_sm{0} [0 0 0 6] [0 0 0 28] [0 0 0 48]
-    set bot_sec                                     + [0 h master.mcp.size{0}] * scale [0 -23 0 23]
+    set hide_pan_sm                                 hide_pan
+    set hide_pan_labels_sm                          hide_pan_labels
+    set fx_sec                                      + [0 0 master.mcp.size{0}] [0 0 0 27]
+    set pan_sec                                     + [0 fx_sec{3} master.mcp.size{0}] h<hide_pan_labels_sm{0} h<hide_pan_sm{0} [0 0 0 6] [0 0 0 28] [0 0 0 48]
+    set bot_sec                                     + [0 h master.mcp.size{0}] [0 -23 0 23]
     set stretch_sec_start                           + fx_sec{3} pan_sec{3}
     set stretch_sec_height                          - - - h fx_sec{3} pan_sec{3} bot_sec{3}
     set stretch_sec                                 [0 stretch_sec_start{0} master.mcp.size{0} stretch_sec_height{0}]
-    set padding_reduction_h                         * scale [300 200]
-    set padding                                     * scale stretch_sec_height{0}<padding_reduction_h{0} stretch_sec_height{0}<padding_reduction_h{1} [0 2] [0 3] [0 4]
-    set master.mcp.fx                               * scale [7 7 82 20]
-    set master.mcp.fxbyp                            * scale [89 7 29 20]
-    set master.mcp.pan                              + [0 pan_sec] * scale h<hide_pan_sm{0} [0]      width_visible{0}==2     h<hide_pan_labels_sm{0} [7 5 67 9] [7 15 67 9] \
+    set padding_reduction_h                         [300 200]
+    set padding                                     stretch_sec_height{0}<padding_reduction_h{0} stretch_sec_height{0}<padding_reduction_h{1} [0 2] [0 3] [0 4]
+    set master.mcp.fx                               [7 7 82 20]
+    set master.mcp.fxbyp                            [89 7 29 20]
+    set master.mcp.pan                              + [0 pan_sec] h<hide_pan_sm{0} [0]      width_visible{0}==2     h<hide_pan_labels_sm{0} [7 5 67 9] [7 15 67 9] \
                                                                                                 width_visible{0}!=0     h<hide_pan_labels_sm{0} [20 4 20 20] [20 7 20 20] \
                                                                                                                     h<hide_pan_labels_sm{0} [31 4 20 20] [31 7 20 20]
-      set master.mcp.pan.fadermode                  gl_fader_swap
-      set master.mcp.pan.color                      gl_pan_color
-      set master.mcp.pan.label                      h<hide_pan_labels_sm{x} [0] + [0 master.mcp.pan] * scale width_visible{0}!=0 width_visible{0}==2 [23 -11 35 9] [6 25 35 10] [23 25 35 10]
-      set master.mcp.pan.label.color                [140 140 140]
-      set master.mcp.pan.label.margin               [0 0 0 0 0.5]
-      set master.mcp.pan.label.font                 scale==1 [1] scale==1.5 [6] [11]
-    set master.mcp.width                            + [0 pan_sec] * scale h<hide_pan_sm{0} [0]      width_visible{0}==2     h<hide_pan_labels_sm{0} [7 13 67 9] [7 23 67 9] \
+    set master.mcp.pan.fadermode                    gl_fader_swap
+    set master.mcp.pan.label                        h<hide_pan_labels_sm{x} [0] + [0 master.mcp.pan] width_visible{0}!=0 width_visible{0}==2 [23 -11 35 9] [6 25 35 10] [23 25 35 10]
+    set master.mcp.width                              + [0 pan_sec] h<hide_pan_sm{0} [0]      width_visible{0}==2     h<hide_pan_labels_sm{0} [7 13 67 9] [7 23 67 9] \
                                                                                                 width_visible{0}!=0     h<hide_pan_labels_sm{0} [48 4 20 20] [48 7 20 20] [0]
-      set master.mcp.width.fadermode                gl_fader_swap
-      set master.mcp.width.color                    gl_width_color
-      set master.mcp.width.label                    h<hide_pan_labels_sm{x} [0] + [0 master.mcp.width] * scale width_visible{0}!=0 width_visible{0}==2 [23 11 35 9] [41 25 35 10] [0]
-      set master.mcp.width.label.color              [140 140 140]
-      set master.mcp.width.label.margin             [0 0 0 0 0.5]
-      set master.mcp.width.label.font               scale==1 [1] scale==1.5 [6] [11]
-    set master.mcp.mono                             + [0 pan_sec] * scale h<hide_pan_labels_sm{0} h<hide_pan_sm{0} [0] [93 4 25 22] [93 8 25 33]
-    set master.mcp.volume.label                     h<hide_volume_label{0} [0 0 0 0] + [0 stretch_sec] * scale [1 0 89 23]
-      set master.mcp.volume                         - + + * scale [69 0 21] [0 stretch_sec 0 stretch_sec] [0 master.mcp.volume.label{3}] [0 0 0 master.mcp.volume.label{3}]
-      set master.mcp.volume.label.color             master.mcp.volume.label{h}>2 [100 100 100] [38 38 38]
-      set master.mcp.volume.label.margin            + [0 0 0 0 0.5] * scale [0 4]
-      set master.mcp.volume.label.font              scale==1 [1] scale==1.5 [6] [11]
-    set master.mcp.meter                            + [0 master.mcp.volume 0 master.mcp.volume] * scale [4 0 59 -6]
-      set master.mcp.meter.vu.div                   [1]
-      set master.mcp.meter.vu.rmsdiv                [2]
-      set master.mcp.meter.readout.color            [255 255 255 200 0 0 0 0]
-      set master.mcp.meter.rmsreadout.color         [255 255 255 255 0 0 0 0]
-      set master.mcp.meter.scale.color.lit.bottom   [0 0 0 200 0 0 0 0]
-      set master.mcp.meter.scale.color.lit.top      [0 0 0 200 0 0 0 0]
-      set master.mcp.meter.scale.color.unlit.bottom [255 255 255 120 0 0 0 0]
-      set master.mcp.meter.scale.color.unlit.top    [255 255 255 120 0 0 0 0]
+    set master.mcp.width.fadermode                  gl_fader_swap
+    set master.mcp.width.label                      h<hide_pan_labels_sm{x} [0] + [0 master.mcp.width] width_visible{0}!=0 width_visible{0}==2 [23 11 35 9] [41 25 35 10] [0]
+    set master.mcp.mono                               + [0 pan_sec] h<hide_pan_labels_sm{0} h<hide_pan_sm{0} [0] [93 4 25 22] [93 8 25 33]
+    set master.mcp.volume.label                       h<hide_volume_label{0} [0 0 0 0] + [0 stretch_sec] [1 0 89 23]
+    set master.mcp.volume                           - + + [69 0 21] [0 stretch_sec 0 stretch_sec] [0 master.mcp.volume.label{3}] [0 0 0 master.mcp.volume.label{3}]
+    
+    set master.mcp.meter                            + [0 master.mcp.volume 0 master.mcp.volume] [4 0 59 -6]
+    set master.mcp.meter.vu.div                     [1]
+    set master.mcp.meter.vu.rmsdiv                  [2]
+    
     set master.mcp.label                            bot_sec
-      set master.mcp.label.color                    [184 184 184]
-      set master.mcp.label.margin                   + * scale [20 1] [0 0 0 0 0.5]
-      set master.mcp.label.font                     scale==1 [3] scale==1.5 [8] [13]
-    set master.mcp.mute                             + [0 stretch_sec] * scale [95 6 21 20]
-    set master.mcp.solo                             + + [0 padding] [master.mcp.mute master.mcp.mute] * scale [0 21 21 20]
-    set master_mcp_env_hide_h                       * scale 141
-    set master.mcp.env                              stretch_sec_height{0}<master_mcp_env_hide_h{0} [0] + + [0 stretch_sec] [0 stretch_sec{3}] * scale [95 -37 21 30]
-    set master_mcp_io_hide_h                        * scale 106
-    set master.mcp.io                               stretch_sec_height{0}<master_mcp_io_hide_h{0} [0] + + [0 padding] [master.mcp.solo master.mcp.solo] * scale [0 23 23 30]
-    set master.mcp.menubutton                       + * scale [0 2 20 20] [bot_sec bot_sec]
+    set master.mcp.mute                             + [0 stretch_sec] [95 6 21 20]
+    set master.mcp.solo                             + + [0 padding] [master.mcp.mute master.mcp.mute] [0 21 21 20]
+    set master_mcp_env_hide_h                       141
+    set master.mcp.env                              stretch_sec_height{0}<master_mcp_env_hide_h{0} [0] + + [0 stretch_sec] [0 stretch_sec{3}] [95 -37 21 30]
+    set master_mcp_io_hide_h                        106
+    set master.mcp.io                               stretch_sec_height{0}<master_mcp_io_hide_h{0} [0] + + [0 padding] [master.mcp.solo master.mcp.solo] [0 23 23 30]
+    set master.mcp.menubutton                       + [0 2 20 20] [bot_sec bot_sec]
     set master.mcp.extmixer.mode                    [0]
-        set master.mcp.fxlist.font                  scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
-        set master.mcp.fxlist.margin                mcp.fxlist.margin 
-        set master.mcp.sendlist.font                scale==1 [1 16 0 0 0 0 1 4] scale==1.5 [6 24 0 0 0 0 2 6] [11 32 0 0 0 0 2 8]
-        set master.mcp.sendlist.margin              mcp.sendlist.margin
-        set master.mcp.fxparm.font                  scale{0}==1 [1 24 0 0 -1] scale{0}==1.5 [6 36 0 0 -4] [11 48 0 0 -6]
-        set master.mcp.fxparm.font                  + . os_type==1 * scale [0 0 0 0 3] [0]
-        set master.mcp.fxparm.margin                mcp.fxparm.margin
+    
+
+    ; >>>> Fonts/Colors/Margins
+    set master.mcp.pan.label.font                   [1]
+    set master.mcp.width.label.font                 [1]
+    set master.mcp.volume.label.font                [1]
+    set master.mcp.label.font                       [3]
+    set master.mcp.fxlist.font                      [1 16 0 0 0 0 1 4]
+    set master.mcp.sendlist.font                    [1 16 0 0 0 0 1 4]
+    set master.mcp.fxparm.font                      [1 24 0 0 -1]
+    set master.mcp.fxparm.font                      + . os_type==1 [0 0 0 0 3] [0]
+    
+    set master.mcp.label.color                      [184 184 184]
+    set master.mcp.pan.color                        gl_pan_color
+    set master.mcp.width.color                      gl_width_color
+    set master.mcp.width.label.color                [140 140 140]
+    set master.mcp.volume.label.color               [240 240 240]
+    set master.mcp.pan.label.color                  [240 240 240]
+
+    set master.mcp.meter.readout.color              [240 240 0]
+    set master.mcp.meter.rmsreadout.color           [255 255 255 255 0 0 0 0]
+    set master.mcp.meter.scale.color.lit.bottom     [0 0 0 200 0 0 0 0]
+    set master.mcp.meter.scale.color.lit.top        [0 0 0 200 0 0 0 0]
+    set master.mcp.meter.scale.color.unlit.bottom   [220 220 220]
+    set master.mcp.meter.scale.color.unlit.top      [220 220 220]
+    
+    set master.mcp.pan.label.margin                 [0 0 0 0 0.5]
+    set master.mcp.width.label.margin               [0 0 0 0 0.5]
+    set master.mcp.volume.label.margin              + [0 0 0 0 0.5] [0 4]
+    set master.mcp.label.margin                     + [20 1] [0 0 0 0 0.5]
+    set master.mcp.fxlist.margin                    mcp.fxlist.margin 
+    set master.mcp.sendlist.margin                  mcp.sendlist.margin
+    set master.mcp.fxparm.margin                    mcp.fxparm.margin
 endmacro
 
+;-------------
+front                  master.mcp.menubutton master.mcp.io master.mcp.env master.mcp.mute master.mcp.solo
 drawMasterMcp 1
-
-set master.mcp.volume.label.color              [240 240 240]
-set master.mcp.pan.label.color                 [240 240 240]
-
-set master.mcp.meter.readout.color             [240 240 0]
-set master.mcp.meter.scale.color.unlit.bottom  [220 220 220]
-set master.mcp.meter.scale.color.unlit.top     [220 220 220]
-
 
 
 
