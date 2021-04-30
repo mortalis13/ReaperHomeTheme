@@ -670,7 +670,7 @@ macro drawMcp
     set mcp.volume.label                        ?narrowMode{0} [0] \
                                                     + [stretch_sec stretch_sec mcp.meter{2}] h<hide_volume_label_s{0} [1 0 28 4] !labelsMode{0} [1 0 28 4] [1 0 28 23]
                                                     ; + h<hide_volume_label_s{0} [1 0 28 4] !labelsMode{0} [1 0 28 4] [1 0 28 23] [stretch_sec stretch_sec mcp.meter{2}]
-      set mcp.volume                            ?narrowMode{0} + - + [stretch_sec stretch_sec] [nchan_offs_half stretch_sec{3}] [-4 21] [0 0 21 21] \
+    set mcp.volume                              ?narrowMode{0} + - + [stretch_sec stretch_sec] [nchan_offs_half stretch_sec{3}] [-4 21] [0 0 21 21] \
                                                     - + * [1 1 1 1] [mcp.meter stretch_sec 21 stretch_sec] [mcp.meter{2} mcp.volume.label{3}] [-4 0 0 mcp.volume.label{3}]
     set mcp.recarm                              + [0 0 36 24] ?narrowMode{0} - + [mcp.meter{2}] [stretch_sec stretch_sec] [-1 17] \
                                                         + - [stretch_sec stretch_sec] [-29 17] [mcp.meter{2}]
@@ -717,9 +717,9 @@ macro drawMcp
     set mcp.volume.label.color                  [240 240 240]
     set mcp.pan.label.color                     ?track_selected  [50 50 50]  [240 240 240]
 
-    set mcp.meter.readout.color                 [240 240 240]
-    set mcp.meter.scale.color.unlit.bottom      [240 240 240]
-    set mcp.meter.scale.color.unlit.top         [240 240 240]
+    set mcp.meter.readout.color                 [220 220 220]
+    set mcp.meter.scale.color.unlit.bottom      [200 200 200]
+    set mcp.meter.scale.color.unlit.top         [200 200 200]
     set mcp.meter.scale.color.lit.bottom        [0 0 0]
     set mcp.meter.scale.color.lit.top           [0 0 0]
     
@@ -819,12 +819,12 @@ macro drawMasterMcp
     set master.mcp.volume.label.color               [240 240 240]
     set master.mcp.pan.label.color                  [240 240 240]
 
-    set master.mcp.meter.readout.color              [240 240 0]
-    set master.mcp.meter.rmsreadout.color           [255 255 255 255 0 0 0 0]
-    set master.mcp.meter.scale.color.lit.bottom     [0 0 0 200 0 0 0 0]
-    set master.mcp.meter.scale.color.lit.top        [0 0 0 200 0 0 0 0]
-    set master.mcp.meter.scale.color.unlit.bottom   [220 220 220]
-    set master.mcp.meter.scale.color.unlit.top      [220 220 220]
+    set master.mcp.meter.readout.color              [220 220 0]
+    set master.mcp.meter.rmsreadout.color           [200 200 200 255  0 0 0 0]
+    set master.mcp.meter.scale.color.lit.bottom     [0 0 0 255  0 0 0 0]
+    set master.mcp.meter.scale.color.lit.top        [0 0 0 255  0 0 0 0]
+    set master.mcp.meter.scale.color.unlit.bottom   [200 200 200]
+    set master.mcp.meter.scale.color.unlit.top      [200 200 200]
     
     set master.mcp.pan.label.margin                 [0 0 0 0 0.5]
     set master.mcp.width.label.margin               [0 0 0 0 0.5]
