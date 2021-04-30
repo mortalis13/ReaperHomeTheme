@@ -179,9 +179,9 @@ macro drawTcp
     ; >>>> ROW_4
     set volume_w                     - - - - tcp_w track_idx_off tcp.meter{w} * 2 tcp_pad_left pan_w
     set volume_w                     main_eff{0}<_break_w_3_{0}  + + volume_w  pan_w  * 0.5 tcp_pad_left
-    set tcp.volume                   + [track_idx_off 0 volume_w{0}]  [tcp_pad_left row4_y -10 btn_h2 0 0 1 0]
+    set tcp.volume                   + [track_idx_off 0 volume_w{0}]  [tcp_pad_left row4_y -10 28 0 0 1 0]
 
-    set tcp.pan                      + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [pan_w]  [0 row4_y pan_w btn_h2 1 0 1 0]
+    set tcp.pan                      + - - - [tcp_w]  [tcp.meter{w}]  [tcp_pad_right]  [pan_w]  - [0 row4_y pan_w btn_h2 1 0 1 0] [0 1]
 
     ; >>>> ROW_5
     set tcp.volume.label             + [track_idx_off]  [tcp_pad_left row5_y readout_w 20]
