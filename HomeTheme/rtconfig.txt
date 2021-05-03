@@ -692,7 +692,7 @@ macro drawMcp
                                                     [0 bot_sec mcp.size{0}] \
                                                     ?mcp_control_align{0} * - mcp_maxfolderdepth folderdepth [0 0 0 mcp_indent_s{0}] [0]
     set mcp.trackidx                            + + [0 bot_sec] [0 mcp.label{3}] - [0 0 mcp.size{0} bot_sec_height{0}] [0 0 0 mcp.label{3}]
-    set mcp.folder                              + + [0 bot_sec] [0 mcp.label{3}] folderstate<0 + + [mcp.size] [sidebar_sec{2}] [-21 -2 21 22] [0 -2 18 22]
+    set mcp.folder                              + + [0 bot_sec] [0 mcp.label{3}] folderstate<0 + + [mcp.size] [sidebar_sec{2}] [-21 -2 21 22]  [0 -2 18 22]
 
     
     ; >>>> Fonts/Colors/Margins
