@@ -99,7 +99,7 @@ macro calcTcpSecs
     set tcp_LabelSize             tcp_control_align{0}==2 + - tcp_LabelSize{0} * tcp_indent{0} folderdepth{0} * maxfolderdepth{0} tcp_indent{0} ; extend names for fist line alignment
     set labelEnd                  + tcp_LabelSize{0} 54   ; tune 54 by eye. Sorry.
     set labelFlip                 main_sec{2}<labelEnd{0}  1  0
-    set mainCollapse              main_sec{2}<110  1  0
+    set mainCollapse              main_sec{2}<mainCollapse_w{0}  1  0
     set main_sec                  ?supercollapsed{0} [0] ?mainCollapse{0} ?meterRight{0} \
                                                                               [folder_sec{2} 0 btn_h{0} h] \
                                                                               - [w 0 btn_h{0} h] [btn_h{0}] \
@@ -247,12 +247,12 @@ macro applyTcpHideRules
 
     set tcp.recarm                   main_eff{0}<_break_w_5_{0}  [0]
     set tcp.label                    main_eff{0}<_break_w_5_{0}  [0]
-    set tcp.mute                     main_eff{0}<_break_w_5_{0}  [0]
-    set tcp.solo                     main_eff{0}<_break_w_5_{0}  [0]
+    ;set tcp.mute                     main_eff{0}<_break_w_5_{0}  [0]
+    ;set tcp.solo                     main_eff{0}<_break_w_5_{0}  [0]
     set tcp.recmode                  main_eff{0}<_break_w_5_{0}  [0]
     set tcp.volume                   main_eff{0}<_break_w_5_{0}  [0]
     set tcp.volume.label             main_eff{0}<_break_w_5_{0}  [0]
-
+    
     set tcp.volume.label             h<_break_h_1_{0}  [0]
     set tcp.pan.label                h<_break_h_1_{0}  [0]
 
@@ -285,6 +285,9 @@ macro applyTcpHideRules
     set tcp.solo                     h<_break_h_5_{0}  main_eff{0}<_break_w_3_{0}  + + [tcp.mute{x}]    [tcp.mute{w}]   [0 row1_y mute_solo_w btn_h2]
     set tcp.mute                     main_eff{0}<_break_w_5_{0}  [0]
     set tcp.solo                     main_eff{0}<_break_w_5_{0}  [0]
+    
+    set tcp.mute                     main_eff{0}<_break_w_5_{0} h>_break_h_3_{0}  + - [main_sec] [21] [0 0  20 19]
+    set tcp.solo                     main_eff{0}<_break_w_5_{0} h>_break_h_3_{0}  + - [main_sec] [21] [0 18 20 19]
 endMacro
 
 ;-------------
@@ -299,12 +302,15 @@ set tcp_LabelPair               110
 set tcp_sepSends                0
 set tcp_MeterSize               10
 
+; >>> Breakpoints
+set mainCollapse_w              100
+
 ; compared to main_eff (effective width) instead of w
 set _break_w_1_                 255
 set _break_w_2_                 200
 set _break_w_3_                 178
 set _break_w_4_                 128
-set _break_w_5_                 85
+set _break_w_5_                 80
 
 set _break_h_1_                 155
 set _break_h_2_                 138
@@ -498,7 +504,8 @@ macro calcEnvSecs
     set envcp_padding                           h_less_border{0}<envcp_squash_height{0} + [envcp_padding] * [0 1] / - h_less_border{0} element_h 2
     set Envcp_labelSize                         EnvcpLabelSize{0}==0 EnvLabelAutoMeasured{0}<envLabelMin{0} envLabelMin{0} + EnvLabelAutoMeasured{0} 10 EnvcpLabelSize
     set this_envcp_indent                       + ?EnvFolderIndent{0} * tcp_indent{0} folderdepth{0} [0] [-3 0 -6] ; subtracting 3px to match the lack of visible borders
-    set main_sec                                - + * [1 0 -1] this_envcp_indent [0 0 w h] h<valuesFlipH{0} [0 0 values_w 0] + [0 0 0 13] [0 0 0 envcp_padding{1}]
+    set main_sec                                - + * [1 0 -1] this_envcp_indent [0 0 w h]  h<valuesFlipH{0} [0 0 values_w 0] + [0 0 0 13] [0 0 0 envcp_padding{1}]
+    set main_eff                                + main_sec{w}  h<valuesFlipH{0}  values_w{0} 0
     set values_sec                              h<valuesFlipH{0}  + + [main_sec envcp_padding{1} values_w{0}]  [main_sec{2}]  [0 1 0 13] \
                                                                   + [0 main_sec{3} w] [0 -4 0 13]
     set envcpNullElement                        + + [main_sec] [envcp_padding envcp_padding] [0 0 0 20]
@@ -533,16 +540,27 @@ endmacro
 
 
 macro drawEnvcp
-    set envcp.label.color                       [184 184 184]
+    set envcp.label.color                       [220 220 220]
         set envcp.label.margin                  [2 0 2 0 0]
         set envcp.label.font                    [1]
-    set envcp.value                             w<70  [0]  + values_sec [0 0 0 4]
+    set envcp.value                             main_eff{w}<70  [0]  + values_sec [0 0 0 4]
         set envcp.value.font                    [2]
         set envcp.value.color                   [92 184 169]
         set envcp.value.margin                  * [0 0 1 0 1] [0 0 7 0 1]
     set envcp.fader.color                       [54 217 190]
         set env_fader_w                         21
         set envcp.fader.fadermode               0
+endMacro
+
+
+macro applyEnvcpHideRules
+  set labelHidden                    h<valuesFlipH{0}  !envcp.label{w}  1  0
+  set fader_x                        +   [envcp.bypass{x}] [envcp.bypass{w}]
+  set fader_w                        - - [envcp.value{x}]  [fader_x] [6]
+  
+  set envcp.fader.fadermode          ?labelHidden{0}  0
+  set envcp.fader                    ?labelHidden{0}  [fader_x envcp_padding fader_w{0} 20]
+  set envcp.fader                    main_eff{w}<170  h<valuesFlipH{0}  [0]
 endMacro
 
 ;-------------
@@ -562,6 +580,7 @@ envThen envcp.hide             36                1
 
 ;-------------
 drawEnvcp
+applyEnvcpHideRules
 
 
 
